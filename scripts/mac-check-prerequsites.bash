@@ -1,5 +1,14 @@
 #!/bin/bash
 
+abspath() {
+    local DIR=$(dirname "$1")
+    cd $DIR
+    printf "%s/%s\n" "$(pwd)" "$(basename "$1")" | perl -pe 's{/{2,}}{/}g'
+    cd "$OLDPWD"
+}
+
+THIS_DIR=$(abspath $0)
+
 INSTALL=""
 OS=$(uname -s)
 BOSH_LITES_DIR=$HOME/tmp/bosh-lites
@@ -40,8 +49,3 @@ else
    echo "ERROR: aws cli is not working; please run 'aws configure' and try again"
    exit 3
 fi
-
-seq 1 30 |
-    parallel --tag --line-buffer -I % -j 5 "$HOME/workspace/deployments-aws/thansmann/scripts/run-a-vagrant-bosh-lite.bash $BOSH_LITES_DIR/%; sleep 1"
-
-fixup-bosh-lite-vms.bash
