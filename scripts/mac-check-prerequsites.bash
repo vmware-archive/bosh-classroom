@@ -7,7 +7,7 @@ abspath() {
     cd "$OLDPWD"
 }
 
-THIS_DIR=$(abspath $0)
+THIS_DIR=$(dirname $(abspath $0))
 
 INSTALL=""
 OS=$(uname -s)
