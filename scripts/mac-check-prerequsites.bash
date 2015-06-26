@@ -15,6 +15,7 @@ BOSH_LITES_DIR=$HOME/tmp/bosh-lites
 brew cask --help 2>&1 > /dev/null || INSTALL+="brew install caskroom/cask/brew-cask\n"
 parallel --version 2>&1 > /dev/null || INSTALL+="brew install parallel\n"
 aws --version 2>&1 > /dev/null || INSTALL+="brew install awscli\n "
+# need vagrant 1.6.3
 vagrant --version 2>&1 > /dev/null || INSTALL+="brew cask install vagrant\n"
 
 if (vagrant plugin list > /dev/null 2>&1) ; then
