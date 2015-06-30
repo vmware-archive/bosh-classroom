@@ -16,12 +16,12 @@ THIS_DIR=$(dirname $(abspath $0))
 
 . $THIS_DIR/shell_helpers.bash
 
-OUR_BOSH_LITES=$($THIS_DIR/aws-running-vms.bash| grep $BOSH_LITE_AMI | pcut -f -2 | nl2comma)
-echo "our bosh-lite VMs are $OUR_BOSH_LITES"
-
 # add host keys
-our_boshlites 1 ; parallel -j 50 "ssh -o StrictHostKeyChecking=no ubuntu@{} id" ::: $OUR_BOSHLITES
+our_boshlites 1 
+echo "our bosh-lite VMs are $OUR_BOSHLITES"
+parallel -j 50 "ssh -o StrictHostKeyChecking=no ubuntu@{} id" ::: $OUR_BOSHLITES
+echo parallel -j 50 "ssh -o StrictHostKeyChecking=no ubuntu@{} id" ::: $OUR_BOSHLITES
 
 
 chmod 755 $THIS_DIR/jsh_bosh-lite-box-prep.bash
-jsh -e -w $OUR_BOSH_LITES -l ubuntu -s $THIS_DIR/jsh_bosh-lite-box-prep.bash
+jsh -e -w $OUR_BOSHLITES_JSH -l ubuntu -s $THIS_DIR/jsh_bosh-lite-box-prep.bash
