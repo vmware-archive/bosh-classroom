@@ -4,9 +4,9 @@ ssh-add $HOME/workspace/deployments-aws/thansmann/config/id_rsa_bosh
 
 function our_boshlites() {
     if [[ ! -z "$*" || -z "$OUR_BOSHLITES" ]]; then
-        export OUR_BOSHLITES=$(aws-running-vms.bash | pcut -f -2)
-    fi
-    OUR_BOSHLITES_JSH=$(echo $OUR_BOSHLITES|space2comma)
+        export OUR_BOSHLITES=$(aws-running-vms.bash | cut -d ' ' -f6)
+      fi
+    export OUR_BOSHLITES_JSH=$(echo $OUR_BOSHLITES | tr ' ' ',')
     echo $OUR_BOSHLITES
 }
 
