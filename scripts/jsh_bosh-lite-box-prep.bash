@@ -31,10 +31,10 @@ fi
 if [[ ! -d $DUMMY_RELEASE ]]; then
     git clone https://github.com/pivotal-cf-experimental/dummy-boshrelease.git $DUMMY_RELEASE
     cd  $DUMMY_RELEASE
-    mkdir -p $DUMMY_RELEASE/meetup
-    echo -e "---\nname: dummy-${OUR_AWS_ID}\ndirector_uuid: $UUID" > $DUMMY_RELEASE/meetup/this-bosh-lite.yml
-    cat  $DUMMY_RELEASE/meetup/this-bosh-lite.yml
-    echo -e "---\nname: all-dummy-${OUR_AWS_ID}\ndirector_uuid: $UUID" > $DUMMY_RELEASE/meetup/this-all-dummy-bosh-lite.yml
+    mkdir -p $DUMMY_RELEASE/classroom
+    echo -e "---\nname: first-one\ndirector_uuid: $UUID" > $DUMMY_RELEASE/classroom/first-one-stub.yml
+    cat  $DUMMY_RELEASE/classroom/this-bosh-lite.yml
+    echo -e "---\nname: second-one\ndirector_uuid: $UUID" > $DUMMY_RELEASE/classroom/second-one-stub.yml
 fi
 
 type -a spiff 2>&1 > /dev/null || {
@@ -45,13 +45,13 @@ type -a spiff 2>&1 > /dev/null || {
     type -a spiff
 }
 
-if [[  ! -f  $DUMMY_RELEASE/meetup/deploy-${OUR_AWS_ID}-manifest.yml ]]; then
+if [[  ! -f  $DUMMY_RELEASE/classroom/deploy-${OUR_AWS_ID}-manifest.yml ]]; then
     echo "INFO: Generating dummy deploy manifest"
     cd  $DUMMY_RELEASE && {
-        bash -x ./generate_deployment_manifest warden  $DUMMY_RELEASE/meetup/this-bosh-lite.yml >  $DUMMY_RELEASE/meetup/deploy-${OUR_AWS_ID}-manifest.yml
+        bash -x ./generate_deployment_manifest warden  $DUMMY_RELEASE/classroom/first-one-stub.yml >  $DUMMY_RELEASE/classroom/deploy-${OUR_AWS_ID}-manifest.yml
         spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml \
-              $DUMMY_RELEASE/meetup/this-all-dummy-bosh-lite.yml > $DUMMY_RELEASE/meetup/all-dummy-deploy-${OUR_AWS_ID}-manifest.yml
-        ls -al  $DUMMY_RELEASE/meetup/
+              $DUMMY_RELEASE/classroom/this-all-dummy-bosh-lite.yml > $DUMMY_RELEASE/classroom/all-dummy-deploy-${OUR_AWS_ID}-manifest.yml
+        ls -al  $DUMMY_RELEASE/classroom/
     }
     cd -
 else
