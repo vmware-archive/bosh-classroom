@@ -9,10 +9,13 @@ if ( ! (bosh releases |egrep -q dummy) ); then
 fi
 
 if ( ! (bosh stemcells | egrep -q bosh-warden-boshlite) ) ; then
+    if [[ -f $HOME/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz ]] ; then
+       bosh upload stemcell $HOME/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz
+    else
     bosh upload stemcell  https://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/warden/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz
+    fi
 fi
 
-bosh deployment $DUMMY_RELEASE/meetup/deploy-i-*-manifest.yml
-bosh -n deploy
-bosh deployment $DUMMY_RELEASE/meetup/all-dummy-deploy-*-manifest.yml
-bosh -n deploy
+for i in $DUMMY_RELEASE/classroom/{first,second}.yml ; do
+    bosh -d $i -n deploy
+done
