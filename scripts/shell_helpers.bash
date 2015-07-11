@@ -36,3 +36,33 @@ function aws-start-bosh-lites (){
 function bosh-lite-ips (){
   aws-running-vms.bash | grep ami-905e65f8 |grep running | grep_ip -o
 }
+
+function vagrant_ssh_setup () {
+  mkdir -p ~/.ssh
+  curl -s https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant > ~/.ssh/id_rsa_vagrant
+  chmod 600 ~/.ssh/id_rsa_vagrant
+  cat << EOF >> ~/.ssh/config
+
+Host vagrant
+	HostName 192.168.50.4
+	User vagrant
+	IdentityFile ~/.ssh/id_rsa_vagrant
+EOF
+}
+
+function vagrant_ssh_setup () {
+  mkdir -p ~/.ssh
+  curl -s https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant > ~/.ssh/id_rsa_vagrant
+  chmod 600 ~/.ssh/id_rsa_vagrant
+
+  if (egrep -q id_rsa_vagrant $HOME/.ssh/config) ; then
+    echo "INFO: vagrant ssh config found in $HOME/.ssh/config"
+  else
+cat << EOF >> $HOME/.ssh/config
+Host vagrant-default
+        HostName 192.168.50.4
+        User vagrant
+        IdentityFile $ALT_HOME/.ssh/id_rsa_vagrant
+EOF
+  fi
+}
