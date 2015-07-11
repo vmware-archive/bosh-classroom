@@ -1,14 +1,22 @@
 #!/bin/bash
 _USERID=$(id --name -u)
 sudo chown -R $_USERID .
+mkdir -p ~/workspace ~/tmp
 
 if [[ ! -f ~/did-apt-get-update ]]; then
     sudo apt-get update
     date >> ~/did-apt-get-update
 fi
 
+if [[ ! -f ~/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz ]]; then
+    cd && nohup wget -q https://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/warden/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz &
+disown $!
+else
+    echo "INFO: Stemcell is already downloaded"
+fi
+
 DUMMY_RELEASE=~/workspace/dummy
-export OUR_AWS_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+
 export  UUID=$(bosh -n status |grep UUID| awk '{print $NF}')
 
 [[ -f ~/.ssh/id_rsa ]] || {
@@ -19,23 +27,21 @@ export  UUID=$(bosh -n status |grep UUID| awk '{print $NF}')
 
 type -a git || sudo apt-get install -y git
 
-mkdir -p ~/workspace ~/tmp
-
 if [[ ! -d ~/basic-env ]] ; then
     cd && git clone https://github.com/pivotal-cf-experimental/basic-env.git
     . basic-env/.profile
     new_env
     rm -rf ~/parrallel-*
-    ln -svf .profile .bashrc
 fi
 
 if [[ ! -d $DUMMY_RELEASE ]]; then
+    set -x
     git clone https://github.com/pivotal-cf-experimental/dummy-boshrelease.git $DUMMY_RELEASE
     cd  $DUMMY_RELEASE
-    mkdir -p $DUMMY_RELEASE/meetup
-    echo -e "---\nname: dummy-${OUR_AWS_ID}\ndirector_uuid: $UUID" > $DUMMY_RELEASE/meetup/this-bosh-lite.yml
-    cat  $DUMMY_RELEASE/meetup/this-bosh-lite.yml
-    echo -e "---\nname: all-dummy-${OUR_AWS_ID}\ndirector_uuid: $UUID" > $DUMMY_RELEASE/meetup/this-all-dummy-bosh-lite.yml
+    mkdir -p $DUMMY_RELEASE/classroom
+    echo -e "---\nname: first\ndirector_uuid: $UUID" >  $DUMMY_RELEASE/classroom/stub-first.yml
+    echo -e "---\nname: second\ndirector_uuid: $UUID" > $DUMMY_RELEASE/classroom/stub-second.yml
+    set +x
 fi
 
 type -a spiff 2>&1 > /dev/null || {
@@ -46,24 +52,16 @@ type -a spiff 2>&1 > /dev/null || {
     type -a spiff
 }
 
-if [[  ! -f  $DUMMY_RELEASE/meetup/deploy-${OUR_AWS_ID}-manifest.yml ]]; then
+if [[  ! -f  $DUMMY_RELEASE/classroom/deploy-${OUR_AWS_ID}-manifest.yml ]]; then
     echo "INFO: Generating dummy deploy manifest"
     cd  $DUMMY_RELEASE && {
-        bash -x ./generate_deployment_manifest warden  $DUMMY_RELEASE/meetup/this-bosh-lite.yml >  $DUMMY_RELEASE/meetup/deploy-${OUR_AWS_ID}-manifest.yml
-        spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml \
-              $DUMMY_RELEASE/meetup/this-all-dummy-bosh-lite.yml > $DUMMY_RELEASE/meetup/all-dummy-deploy-${OUR_AWS_ID}-manifest.yml
-        ls -al  $DUMMY_RELEASE/meetup/
+        bash -x ./generate_deployment_manifest warden  $DUMMY_RELEASE/classroom/stub-first.yml >  $DUMMY_RELEASE/classroom/first.yml
+        spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml $DUMMY_RELEASE/classroom/stub-second.yml >  $DUMMY_RELEASE/classroom/second.yml
+        ls -al  $DUMMY_RELEASE/classroom/
     }
     cd -
 else
     echo "INFO: dummy deploy manifest already generated"
-fi
-
-if [[ ! -f ~/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz ]]; then
-    cd && wget -q https://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/warden/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz
-    ls -lart bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz
-else
-    echo "INFO: Stemcell is already downloaded"
 fi
 
 if ( ! (egrep -q sFnRXKn6gwnutEwDSvxwyl19pk4EKtQz ~/.ssh/authorized_keys) ); then
