@@ -74,6 +74,5 @@ else
 fi
 sudo updatedb
 
-echo "PATH+=:/var/vcap/bosh/bin" >> ~/.profile
 
 sudo perl -i.old -pe 's{(minimum_down_jobs:).*$}{$1 1\n}xms' /var/vcap/jobs/health_monitor/config/health_monitor.yml

@@ -15,8 +15,8 @@ abspath() {
 THIS_DIR=$(dirname $(abspath $0))
 $THIS_DIR/mac-check-prerequsites.bash
 
-seq 1 30 |
-    parallel --tag --line-buffer -I % -j 5 "$THIS_DIR/run-a-vagrant-bosh-lite.bash $BOSH_LITES_DIR/%; sleep 1"
+seq 1 3 |
+    parallel --tag -I % -j 5 "$THIS_DIR/run-a-vagrant-bosh-lite.bash $BOSH_LITES_DIR/%; sleep 1"
 
 . $THIS_DIR/shell_helpers.bash
 

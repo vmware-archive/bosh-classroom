@@ -3,11 +3,6 @@ _USERID=$(id --name -u)
 sudo chown -R $_USERID .
 mkdir -p ~/workspace ~/tmp
 
-if [[ ! -f ~/did-apt-get-update ]]; then
-    sudo apt-get update
-    date >> ~/did-apt-get-update
-fi
-
 if [[ ! -f ~/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz ]]; then
     cd && nohup wget -q https://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/warden/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz &
 disown $!
@@ -52,7 +47,7 @@ type -a spiff 2>&1 > /dev/null || {
     type -a spiff
 }
 
-if [[  ! -f  $DUMMY_RELEASE/classroom/deploy-${OUR_AWS_ID}-manifest.yml ]]; then
+if [[  ! -f  $DUMMY_RELEASE/classroom/first.yml ]]; then
     echo "INFO: Generating dummy deploy manifest"
     cd  $DUMMY_RELEASE && {
         bash -x ./generate_deployment_manifest warden  $DUMMY_RELEASE/classroom/stub-first.yml >  $DUMMY_RELEASE/classroom/first.yml
@@ -73,7 +68,5 @@ else
     echo "INFO: pub key file has already been added"
 fi
 sudo updatedb
-
-echo "PATH+=:/var/vcap/bosh/bin" >> ~/.profile
 
 sudo perl -i.old -pe 's{(minimum_down_jobs:).*$}{$1 1\n}xms' /var/vcap/jobs/health_monitor/config/health_monitor.yml
