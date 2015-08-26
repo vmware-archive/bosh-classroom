@@ -52,16 +52,22 @@ type -a spiff 2>&1 > /dev/null || {
     type -a spiff
 }
 
-if [[  ! -f  $DUMMY_RELEASE/classroom/deploy-${OUR_AWS_ID}-manifest.yml ]]; then
+if [[  ! -f  $DUMMY_RELEASE/classroom/first-one.yml ]]; then
     echo "INFO: Generating dummy deploy manifest"
-    cd  $DUMMY_RELEASE && {
-        bash -x ./generate_deployment_manifest warden  $DUMMY_RELEASE/classroom/stub-first.yml >  $DUMMY_RELEASE/classroom/first.yml
-        spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml $DUMMY_RELEASE/classroom/stub-second.yml >  $DUMMY_RELEASE/classroom/second.yml
-        ls -al  $DUMMY_RELEASE/classroom/
-    }
+    cd  $DUMMY_RELEASE && \
+    ./generate_deployment_manifest warden ~/workspace/dummy/classroom/first-one-stub.yml > ~/workspace/dummy/classroom/first-one.yml
+    else
+      echo "INFO: dummy deploy manifest 'first-one.yml' already generated"
+fi
+
+if [[  ! -f  $DUMMY_RELEASE/classroom/second-one.yml ]]; then
+    cd  $DUMMY_RELEASE && \
+    spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml \
+              $DUMMY_RELEASE/classroom/second-one-stub.yml > $DUMMY_RELEASE/classroom/second-one.yml
+    ls -al  $DUMMY_RELEASE/classroom/
     cd -
-else
-    echo "INFO: dummy deploy manifest already generated"
+    else
+      echo "INFO: dummy deploy manifest 'second-one.yml' already generated"
 fi
 
 if ( ! (egrep -q sFnRXKn6gwnutEwDSvxwyl19pk4EKtQz ~/.ssh/authorized_keys) ); then
@@ -73,6 +79,5 @@ else
     echo "INFO: pub key file has already been added"
 fi
 sudo updatedb
-
 
 sudo perl -i.old -pe 's{(minimum_down_jobs:).*$}{$1 1\n}xms' /var/vcap/jobs/health_monitor/config/health_monitor.yml

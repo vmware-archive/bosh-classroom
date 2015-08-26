@@ -2,9 +2,15 @@ source $HOME/workspace/deployments-aws/thansmann/bosh_environment
 PATH+=":$HOME/workspace/bosh-classroom/scripts"
 ssh-add $HOME/workspace/deployments-aws/thansmann/config/id_rsa_bosh
 
+
+function grep_ip(){
+grep -E "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" $*
+
+}
+
 function our_boshlites() {
     if [[ ! -z "$*" || -z "$OUR_BOSHLITES" ]]; then
-        export OUR_BOSHLITES=$(aws-running-vms.bash | cut -d ' ' -f6)
+        export OUR_BOSHLITES=$(aws-running-vms.bash | grep_ip -o)
       fi
     export OUR_BOSHLITES_JSH=$(echo $OUR_BOSHLITES | tr ' ' ',')
     echo $OUR_BOSHLITES
