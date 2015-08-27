@@ -55,7 +55,7 @@ type -a spiff 2>&1 > /dev/null || {
 if [[  ! -f  $DUMMY_RELEASE/classroom/first-one.yml ]]; then
     echo "INFO: Generating dummy deploy manifest"
     cd  $DUMMY_RELEASE && \
-    ./generate_deployment_manifest warden ~/workspace/dummy/classroom/first-one-stub.yml > ~/workspace/dummy/classroom/first-one.yml
+    ./generate_deployment_manifest warden ~/workspace/dummy/classroom/stub-first.yml > ~/workspace/dummy/classroom/first-one.yml
     else
       echo "INFO: dummy deploy manifest 'first-one.yml' already generated"
 fi
@@ -63,7 +63,7 @@ fi
 if [[  ! -f  $DUMMY_RELEASE/classroom/second-one.yml ]]; then
     cd  $DUMMY_RELEASE && \
     spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml \
-              $DUMMY_RELEASE/classroom/second-one-stub.yml > $DUMMY_RELEASE/classroom/second-one.yml
+              $DUMMY_RELEASE/classroom/stub-second.yml > $DUMMY_RELEASE/classroom/second-one.yml
     ls -al  $DUMMY_RELEASE/classroom/
     cd -
     else

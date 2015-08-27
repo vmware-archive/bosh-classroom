@@ -35,7 +35,7 @@ function aws-stop-bosh-lites (){
 }
 
 function aws-start-bosh-lites (){
-  STOPPED_BOSHLITES=$(aws-stopped-vms.bash| awk '{print $2}')
+  STOPPED_BOSHLITES=$(aws-stopped-vms.bash| egrep -o '\bi-........\b'|nl2space)
   parallel -j 2 "aws ec2 start-instances --instance-ids {}" ::: $STOPPED_BOSHLITES
 }
 
