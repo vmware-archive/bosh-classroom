@@ -16,6 +16,6 @@ if ( ! (bosh stemcells | egrep -q bosh-warden-boshlite) ) ; then
     fi
 fi
 
-for i in $DUMMY_RELEASE/classroom/{first,second}.yml ; do
+for i in $HOME/workspace/classroom/{first,second}.yml ; do
     bosh -d $i -n deploy
 done

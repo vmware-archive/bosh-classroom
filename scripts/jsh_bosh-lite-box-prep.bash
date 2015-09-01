@@ -3,11 +3,6 @@ _USERID=$(id --name -u)
 sudo chown -R $_USERID .
 mkdir -p ~/workspace ~/tmp
 
-if [[ ! -f ~/did-apt-get-update ]]; then
-    sudo apt-get update
-    date >> ~/did-apt-get-update
-fi
-
 if [[ ! -f ~/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz ]]; then
     cd && nohup wget -q https://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/warden/bosh-stemcell-389-warden-boshlite-ubuntu-trusty-go_agent.tgz &
 disown $!
@@ -38,9 +33,9 @@ if [[ ! -d $DUMMY_RELEASE ]]; then
     set -x
     git clone https://github.com/pivotal-cf-experimental/dummy-boshrelease.git $DUMMY_RELEASE
     cd  $DUMMY_RELEASE
-    mkdir -p $DUMMY_RELEASE/classroom
-    echo -e "---\nname: first\ndirector_uuid: $UUID" >  $DUMMY_RELEASE/classroom/stub-first.yml
-    echo -e "---\nname: second\ndirector_uuid: $UUID" > $DUMMY_RELEASE/classroom/stub-second.yml
+    mkdir -p $HOME/workspace/classroom
+    echo -e "---\nname: first\ndirector_uuid: $UUID" >  $HOME/workspace/classroom/stub-first.yml
+    echo -e "---\nname: second\ndirector_uuid: $UUID" > $HOME/workspace/classroom/stub-second.yml
     set +x
 fi
 
@@ -52,7 +47,7 @@ type -a spiff 2>&1 > /dev/null || {
     type -a spiff
 }
 
-if [[  ! -f  $DUMMY_RELEASE/classroom/first.yml ]]; then
+if [[  ! -f  $HOME/workspace/classroom/first.yml ]]; then
     echo "INFO: Generating dummy deploy manifest"
     cd  $DUMMY_RELEASE && \
     ./generate_deployment_manifest warden ~/workspace/dummy/classroom/stub-first.yml > ~/workspace/dummy/classroom/first.yml
@@ -60,11 +55,11 @@ if [[  ! -f  $DUMMY_RELEASE/classroom/first.yml ]]; then
       echo "INFO: dummy deploy manifest 'first.yml' already generated"
 fi
 
-if [[  ! -f  $DUMMY_RELEASE/classroom/second.yml ]]; then
+if [[  ! -f  $HOME/workspace/classroom/second.yml ]]; then
     cd  $DUMMY_RELEASE && \
     spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml \
-              $DUMMY_RELEASE/classroom/stub-second.yml > $DUMMY_RELEASE/classroom/second.yml
-    ls -al  $DUMMY_RELEASE/classroom/
+              $HOME/workspace/classroom/stub-second.yml > $DUMMY_RELEASE/classroom/second.yml
+    ls -al  $HOME/workspace/classroom/
     cd -
     else
       echo "INFO: dummy deploy manifest 'second.yml' already generated"
