@@ -52,22 +52,22 @@ type -a spiff 2>&1 > /dev/null || {
     type -a spiff
 }
 
-if [[  ! -f  $DUMMY_RELEASE/classroom/first-one.yml ]]; then
+if [[  ! -f  $DUMMY_RELEASE/classroom/first.yml ]]; then
     echo "INFO: Generating dummy deploy manifest"
     cd  $DUMMY_RELEASE && \
-    ./generate_deployment_manifest warden ~/workspace/dummy/classroom/stub-first.yml > ~/workspace/dummy/classroom/first-one.yml
+    ./generate_deployment_manifest warden ~/workspace/dummy/classroom/stub-first.yml > ~/workspace/dummy/classroom/first.yml
     else
-      echo "INFO: dummy deploy manifest 'first-one.yml' already generated"
+      echo "INFO: dummy deploy manifest 'first.yml' already generated"
 fi
 
-if [[  ! -f  $DUMMY_RELEASE/classroom/second-one.yml ]]; then
+if [[  ! -f  $DUMMY_RELEASE/classroom/second.yml ]]; then
     cd  $DUMMY_RELEASE && \
     spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml \
-              $DUMMY_RELEASE/classroom/stub-second.yml > $DUMMY_RELEASE/classroom/second-one.yml
+              $DUMMY_RELEASE/classroom/stub-second.yml > $DUMMY_RELEASE/classroom/second.yml
     ls -al  $DUMMY_RELEASE/classroom/
     cd -
     else
-      echo "INFO: dummy deploy manifest 'second-one.yml' already generated"
+      echo "INFO: dummy deploy manifest 'second.yml' already generated"
 fi
 
 if ( ! (egrep -q sFnRXKn6gwnutEwDSvxwyl19pk4EKtQz ~/.ssh/authorized_keys) ); then
