@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+NUM_INSTANCES=${1:-20} 
+
 INSTALL=""
 OS=$(uname -s)
 BOSH_LITES_DIR=$HOME/tmp/bosh-lites
@@ -15,7 +17,7 @@ abspath() {
 THIS_DIR=$(dirname $(abspath $0))
 $THIS_DIR/mac-check-prerequsites.bash
 
-seq 1 20 |
+seq 1 $NUM_INSTANCES |
     parallel --tag --line-buffer -I % -j 5 "$THIS_DIR/run-a-vagrant-bosh-lite.bash $BOSH_LITES_DIR/%; sleep 1"
 
 . $THIS_DIR/shell_helpers.bash
