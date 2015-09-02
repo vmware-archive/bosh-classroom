@@ -72,3 +72,8 @@ Host vagrant-default
 EOF
   fi
 }
+
+function run_on_classroom(){
+   our_boshlites refresh
+   jsh -l ubuntu -ew $OUR_BOSHLITES_JSH $*
+}

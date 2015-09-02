@@ -33,9 +33,9 @@ if [[ ! -d $DUMMY_RELEASE ]]; then
     set -x
     git clone https://github.com/pivotal-cf-experimental/dummy-boshrelease.git $DUMMY_RELEASE
     cd  $DUMMY_RELEASE
-    mkdir -p $DUMMY_RELEASE/classroom
-    echo -e "---\nname: first\ndirector_uuid: $UUID" >  $DUMMY_RELEASE/classroom/stub-first.yml
-    echo -e "---\nname: second\ndirector_uuid: $UUID" > $DUMMY_RELEASE/classroom/stub-second.yml
+    mkdir -p $HOME/workspace/classroom
+    echo -e "---\nname: first\ndirector_uuid: $UUID" >  $HOME/workspace/classroom/stub-first.yml
+    echo -e "---\nname: second\ndirector_uuid: $UUID" > $HOME/workspace/classroom/stub-second.yml
     set +x
 fi
 
@@ -47,12 +47,12 @@ type -a spiff 2>&1 > /dev/null || {
     type -a spiff
 }
 
-if [[  ! -f  $DUMMY_RELEASE/classroom/first.yml ]]; then
+if [[  ! -f  $HOME/workspace/classroom/first.yml ]]; then
     echo "INFO: Generating dummy deploy manifest"
     cd  $DUMMY_RELEASE && {
-        bash -x ./generate_deployment_manifest warden  $DUMMY_RELEASE/classroom/stub-first.yml >  $DUMMY_RELEASE/classroom/first.yml
-        spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml $DUMMY_RELEASE/classroom/stub-second.yml >  $DUMMY_RELEASE/classroom/second.yml
-        ls -al  $DUMMY_RELEASE/classroom/
+        bash -x ./generate_deployment_manifest warden  $HOME/workspace/classroom/stub-first.yml >  $DUMMY_RELEASE/classroom/first.yml
+        spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml $HOME/workspace/classroom/stub-second.yml >  $DUMMY_RELEASE/classroom/second.yml
+        ls -al  $HOME/workspace/classroom/
     }
     cd -
 else
