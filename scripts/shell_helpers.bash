@@ -30,7 +30,7 @@ function bosh-lite-ssh-id-add (){
 }
 
 function aws-stop-bosh-lites (){
-  RUNNING_BOSHLITES=$(aws-running-vms.bash | grep ami-905e65f8 |grep running | awk '{print $2}'| nl2space)
+  RUNNING_BOSHLITES=$(aws-running-vms.bash | egrep 'ami-31d7b554|ami-905e65f8' |grep running | awk '{print $2}'| nl2space)
   parallel -j 2 "aws ec2 stop-instances --instance-ids {}" ::: $RUNNING_BOSHLITES
 }
 
@@ -40,7 +40,7 @@ function aws-start-bosh-lites (){
 }
 
 function bosh-lite-ips (){
-  aws-running-vms.bash | grep ami-905e65f8 |grep running | grep_ip -o
+  aws-running-vms.bash | egrep 'ami-31d7b554|ami-905e65f8' |grep running | grep_ip -o
 }
 
 function vagrant_ssh_setup () {
