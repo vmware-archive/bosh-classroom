@@ -13,8 +13,8 @@ re-writing some (all?) of the bosh classroom scripts as a Go binary
     - CNAMEs in hosted zone --> ec2 instances
 - cli actions:
   - `proctor create <name> <number>
-      - generates a new SSH key pair
-      - determines the latest bosh-lite AMI
+      - ~~generates a new SSH key pair~~
+      - ~~determines the latest bosh-lite AMI~~
       - creates a new CloudFormation stack with the given name and number of instances
       - uploads SSH private key to `https://s3.amazonaws.com/bosh-classroom/classrooms/<name>/key`
       - up to instructor to maintain a shortened url pointing to that

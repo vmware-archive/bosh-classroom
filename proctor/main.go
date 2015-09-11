@@ -6,8 +6,6 @@ import (
 )
 
 func main() {
-	const atlasBaseURL = "https://atlas.hashicorp.com"
-	const boxName = "cloudfoundry/bosh-lite"
 	say.Invoke(say.Executable{
 		Name:        "proctor",
 		Description: "bosh classroom helper",
