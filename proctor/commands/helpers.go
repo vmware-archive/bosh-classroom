@@ -30,11 +30,12 @@ func newControllerFromEnv() controller.Controller {
 		AccessKey:  loadOrFail("AWS_ACCESS_KEY_ID"),
 		SecretKey:  loadOrFail("AWS_SECRET_ACCESS_KEY"),
 		RegionName: loadOrFail("AWS_DEFAULT_REGION"),
+		Bucket:     "bosh101",
 	})
 
 	controller := controller.Controller{
 		AtlasClient: atlasClient,
-		AwsClient:   awsClient,
+		AWSClient:   awsClient,
 		Log:         &CliLogger{},
 
 		VagrantBoxName: boxName,

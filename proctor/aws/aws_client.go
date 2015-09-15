@@ -27,6 +27,7 @@ type Client struct {
 
 type S3Client interface {
 	PutObject(input *s3.PutObjectInput) (*s3.PutObjectOutput, error)
+	DeleteObject(input *s3.DeleteObjectInput) (*s3.DeleteObjectOutput, error)
 }
 
 type EC2Client interface {
@@ -49,12 +50,12 @@ func (e *AWSError) Error() string {
 }
 
 type Config struct {
-	AccessKey         string
-	SecretKey         string
-	RegionName        string
-	HostedZoneID      string
-	HostedZoneName    string
-	RecoveryBucket    string
+	AccessKey  string
+	SecretKey  string
+	RegionName string
+	// HostedZoneID      string
+	// HostedZoneName    string
+	Bucket            string
 	EndpointOverrides *Endpoints
 }
 
@@ -75,12 +76,12 @@ func New(config Config) *Client {
 	s3Client := s3.New(sdkConfig.Merge(&aws.Config{MaxRetries: aws.Int(7), Endpoint: aws.String(endpointOverrides.S3), S3ForcePathStyle: aws.Bool(true)}))
 
 	return &Client{
-		EC2:            ec2Client,
-		S3:             s3Client,
-		Route53:        route53Client,
-		HostedZoneID:   config.HostedZoneID,
-		HostedZoneName: config.HostedZoneName,
-		Bucket:         config.RecoveryBucket,
+		EC2:     ec2Client,
+		S3:      s3Client,
+		Route53: route53Client,
+		// HostedZoneID:   config.HostedZoneID,
+		// HostedZoneName: config.HostedZoneName,
+		Bucket: config.Bucket,
 	}
 }
 

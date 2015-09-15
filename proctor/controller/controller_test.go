@@ -23,16 +23,23 @@ var _ = Describe("Controller", func() {
 
 		c = &controller.Controller{
 			AtlasClient: atlasClient,
-			AwsClient:   awsClient,
+			AWSClient:   awsClient,
 			Log:         cliLogger,
 
 			VagrantBoxName: "some/vagrantbox",
 		}
 	})
+
 	Describe("CreateClassroom", func() {
-		It("should create a new SSH Keypair", func() {
+		It("should create a new SSH keypair and upload the private key to S3", func() {
+			awsClient.CreateKeyCall.Returns.PrivateKeyPEM = "some-pem-data"
 			Expect(c.CreateClassroom("some-classroom-name", 42)).To(Succeed())
 			Expect(awsClient.CreateKeyCall.Receives.KeyName).To(Equal("classroom-some-classroom-name"))
+
+			Expect(awsClient.StoreObjectCall.Receives.Name).To(Equal("keys/some-classroom-name"))
+			Expect(awsClient.StoreObjectCall.Receives.Bytes).To(Equal([]byte("some-pem-data")))
+			Expect(awsClient.StoreObjectCall.Receives.DownloadFileName).To(Equal("bosh101_ssh_key.pem"))
+			Expect(awsClient.StoreObjectCall.Receives.ContentType).To(Equal("application/x-pem-file"))
 		})
 
 		It("should get the latest AMI for the vagrant box", func() {
@@ -42,9 +49,10 @@ var _ = Describe("Controller", func() {
 	})
 
 	Describe("DestroyClassroom", func() {
-		It("should destroy the SSH keypair", func() {
+		It("should delete the SSH keypair from EC2 and from S3", func() {
 			Expect(c.DestroyClassroom("some-classroom-name")).To(Succeed())
 			Expect(awsClient.DeleteKeyCall.Receives.KeyName).To(Equal("classroom-some-classroom-name"))
+			Expect(awsClient.DeleteObjectCall.Receives.Name).To(Equal("keys/some-classroom-name"))
 		})
 	})
 })

@@ -6,6 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/say"
 
 	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/aws"
 
@@ -13,6 +14,10 @@ import (
 )
 
 func TestProctor(t *testing.T) {
+	if os.Getenv("SKIP_AWS_INTEGRATION_TESTS") == "true" {
+		say.Println(0, say.Yellow("WARNING: Skipping AWS integration suite"))
+		return
+	}
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "AWS Integration Suite")
 }
@@ -24,6 +29,7 @@ var _ = BeforeSuite(func() {
 		AccessKey:  loadOrFail("AWS_ACCESS_KEY_ID"),
 		SecretKey:  loadOrFail("AWS_SECRET_ACCESS_KEY"),
 		RegionName: loadOrFail("AWS_DEFAULT_REGION"),
+		Bucket:     "bosh101",
 	})
 })
 

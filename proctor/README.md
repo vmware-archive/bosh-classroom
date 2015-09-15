@@ -16,12 +16,11 @@ re-writing some (all?) of the bosh classroom scripts as a Go binary
       - ~~generates a new SSH key pair~~
       - ~~determines the latest bosh-lite AMI~~
       - creates a new CloudFormation stack with the given name and number of instances
-      - uploads SSH private key to `https://s3.amazonaws.com/bosh-classroom/classrooms/<name>/key`
-      - up to instructor to maintain a shortened url pointing to that
+      - ~~uploads SSH private key to `https://bosh101.s3.amazonaws.com/keys/<name>`~~
   - `proctor destroy <name>`
     - destroys the CloudFormation stack
     - ~~deletes the SSH keypair from EC2~~
-    - removes the key object from S3
+    - ~~removes the key object from S3~~
   - `proctor stop <name>`
     - stops (but does not destroy) all the ec2 instances
   - `proctor start <name>`
