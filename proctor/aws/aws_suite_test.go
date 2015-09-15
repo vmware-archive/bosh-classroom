@@ -17,7 +17,7 @@ func TestProctor(t *testing.T) {
 	RunSpecs(t, "AWS Integration Suite")
 }
 
-var awsClient aws.Client
+var awsClient *aws.Client
 
 var _ = BeforeSuite(func() {
 	awsClient = aws.New(aws.Config{

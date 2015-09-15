@@ -58,7 +58,7 @@ type Config struct {
 	EndpointOverrides *Endpoints
 }
 
-func New(config Config) Client {
+func New(config Config) *Client {
 	credentials := credentials.NewStaticCredentials(config.AccessKey, config.SecretKey, "")
 	sdkConfig := &aws.Config{
 		Credentials: credentials,
@@ -74,7 +74,7 @@ func New(config Config) Client {
 	ec2Client := ec2.New(sdkConfig.Merge(&aws.Config{MaxRetries: aws.Int(7), Endpoint: aws.String(endpointOverrides.EC2)}))
 	s3Client := s3.New(sdkConfig.Merge(&aws.Config{MaxRetries: aws.Int(7), Endpoint: aws.String(endpointOverrides.S3), S3ForcePathStyle: aws.Bool(true)}))
 
-	return Client{
+	return &Client{
 		EC2:            ec2Client,
 		S3:             s3Client,
 		Route53:        route53Client,
