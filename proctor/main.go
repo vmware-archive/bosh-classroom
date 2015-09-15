@@ -7,13 +7,15 @@ import (
 
 func main() {
 	say.Invoke(say.Executable{
-		Name:        "proctor",
-		Description: "bosh classroom helper",
+		Name: "proctor",
 		CommandGroups: []say.CommandGroup{
 			{
-				Name:        "Management",
+				Name:        "Actions",
 				Description: "Classroom setup and management",
-				Commands:    []say.Command{commands.NewCreateCommand()},
+				Commands: []say.Command{
+					commands.NewCreateCommand(),
+					commands.NewDestroyCommand(),
+				},
 			},
 		},
 	})

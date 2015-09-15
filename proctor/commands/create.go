@@ -35,7 +35,7 @@ func NewCreateCommand() say.Command {
 	}
 }
 
-func create(stackName string, instanceCount int) error {
+func create(name string, instanceCount int) error {
 	const atlasBaseURL = "https://atlas.hashicorp.com"
 	const boxName = "cloudfoundry/bosh-lite"
 
@@ -55,7 +55,7 @@ func create(stackName string, instanceCount int) error {
 	say.Println(0, "Found %s", say.Green("%s", ami))
 
 	say.Println(0, "Creating new SSH Keypair for EC2...")
-	_, err = awsClient.CreateKey(fmt.Sprintf("classroom-%s", stackName))
+	_, err = awsClient.CreateKey(fmt.Sprintf("classroom-%s", name))
 
 	return err
 }

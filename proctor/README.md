@@ -20,7 +20,7 @@ re-writing some (all?) of the bosh classroom scripts as a Go binary
       - up to instructor to maintain a shortened url pointing to that
   - `proctor destroy <name>`
     - destroys the CloudFormation stack
-    - deletes the SSH keypair from EC2
+    - ~~deletes the SSH keypair from EC2~~
     - removes the key object from S3
   - `proctor stop <name>`
     - stops (but does not destroy) all the ec2 instances
