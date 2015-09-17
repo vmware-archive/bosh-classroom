@@ -1,18 +1,18 @@
 package mocks
 
 type AtlasClient struct {
-	GetLatestAMICall struct {
+	GetLatestAMIsCall struct {
 		Receives struct {
 			BoxName string
 		}
 		Returns struct {
-			AMI   string
-			Error error
+			AMIMap map[string]string
+			Error  error
 		}
 	}
 }
 
-func (c *AtlasClient) GetLatestAMI(boxName string) (string, error) {
-	c.GetLatestAMICall.Receives.BoxName = boxName
-	return c.GetLatestAMICall.Returns.AMI, c.GetLatestAMICall.Returns.Error
+func (c *AtlasClient) GetLatestAMIs(boxName string) (map[string]string, error) {
+	c.GetLatestAMIsCall.Receives.BoxName = boxName
+	return c.GetLatestAMIsCall.Returns.AMIMap, c.GetLatestAMIsCall.Returns.Error
 }

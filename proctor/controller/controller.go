@@ -3,7 +3,7 @@ package controller
 import "fmt"
 
 type atlasClient interface {
-	GetLatestAMI(string) (string, error)
+	GetLatestAMIs(string) (map[string]string, error)
 }
 
 type awsClient interface {
@@ -25,18 +25,29 @@ type Controller struct {
 	Log         cliLogger
 
 	VagrantBoxName string
+	Region         string
+}
+
+func keypairName(classroomName string) string {
+	return "classroom-" + classroomName
 }
 
 func (c *Controller) CreateClassroom(name string, number int) error {
 	c.Log.Println(0, "Looking up latest AMI for %s", c.Log.Green("%s", c.VagrantBoxName))
-	ami, err := c.AtlasClient.GetLatestAMI(c.VagrantBoxName)
+	amiMap, err := c.AtlasClient.GetLatestAMIs(c.VagrantBoxName)
 	if err != nil {
 		return err
 	}
+
+	ami, ok := amiMap[c.Region]
+	if !ok {
+		return fmt.Errorf("Couldn't find AMI in region %s", c.Region)
+	}
 	c.Log.Println(0, "Found %s", c.Log.Green("%s", ami))
 
-	c.Log.Println(0, "Creating new SSH Keypair for EC2...")
-	privateKeyPEMBytes, err := c.AWSClient.CreateKey(fmt.Sprintf("classroom-%s", name))
+	keypair := keypairName(name)
+	c.Log.Println(0, "Creating SSH Keypair %s", c.Log.Green("%s", keypair))
+	privateKeyPEMBytes, err := c.AWSClient.CreateKey(keypair)
 	if err != nil {
 		return err
 	}
@@ -52,7 +63,7 @@ func (c *Controller) CreateClassroom(name string, number int) error {
 
 func (c *Controller) DestroyClassroom(name string) error {
 	c.Log.Println(0, "Deleting classroom keypair...")
-	err := c.AWSClient.DeleteKey(fmt.Sprintf("classroom-%s", name))
+	err := c.AWSClient.DeleteKey(keypairName(name))
 
 	s3Name := "keys/" + name
 	c.Log.Println(0, "Deleting private key from S3...")

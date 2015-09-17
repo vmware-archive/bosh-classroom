@@ -24,12 +24,13 @@ func newControllerFromEnv() controller.Controller {
 	const atlasBaseURL = "https://atlas.hashicorp.com"
 	const boxName = "cloudfoundry/bosh-lite"
 
+	awsRegion := loadOrFail("AWS_DEFAULT_REGION")
 	jsonClient := client.JSONClient{BaseURL: atlasBaseURL}
 	atlasClient := &client.AtlasClient{&jsonClient}
 	awsClient := aws.New(aws.Config{
 		AccessKey:  loadOrFail("AWS_ACCESS_KEY_ID"),
 		SecretKey:  loadOrFail("AWS_SECRET_ACCESS_KEY"),
-		RegionName: loadOrFail("AWS_DEFAULT_REGION"),
+		RegionName: awsRegion,
 		Bucket:     "bosh101",
 	})
 
@@ -39,6 +40,7 @@ func newControllerFromEnv() controller.Controller {
 		Log:         &CliLogger{},
 
 		VagrantBoxName: boxName,
+		Region:         awsRegion,
 	}
 
 	return controller

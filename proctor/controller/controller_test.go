@@ -18,6 +18,9 @@ var _ = Describe("Controller", func() {
 
 	BeforeEach(func() {
 		atlasClient = &mocks.AtlasClient{}
+		atlasClient.GetLatestAMIsCall.Returns.AMIMap = map[string]string{
+			"some-region": "some-ami",
+		}
 		awsClient = &mocks.AWSClient{}
 		cliLogger = &mocks.CLILogger{}
 
@@ -27,6 +30,7 @@ var _ = Describe("Controller", func() {
 			Log:         cliLogger,
 
 			VagrantBoxName: "some/vagrantbox",
+			Region:         "some-region",
 		}
 	})
 
@@ -44,7 +48,7 @@ var _ = Describe("Controller", func() {
 
 		It("should get the latest AMI for the vagrant box", func() {
 			Expect(c.CreateClassroom("some-classroom-name", 42)).To(Succeed())
-			Expect(atlasClient.GetLatestAMICall.Receives.BoxName).To(Equal("some/vagrantbox"))
+			Expect(atlasClient.GetLatestAMIsCall.Receives.BoxName).To(Equal("some/vagrantbox"))
 		})
 	})
 

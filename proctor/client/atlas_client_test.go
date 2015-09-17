@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("AtlasClient", func() {
 	Describe("#GetLatestAMI", func() {
-		It("should return the AMI used by the box", func() {
+		It("should return the AMI used by the box each different regions ", func() {
 			gzippedBoxData, err := ioutil.ReadFile("fixtures/test-box.gz")
 			Expect(err).NotTo(HaveOccurred())
 			fakeDownloadServer := ghttp.NewServer()
@@ -47,10 +47,18 @@ var _ = Describe("AtlasClient", func() {
 			}`, fakeDownloadURL)
 			c := client.AtlasClient{jsonClient}
 
-			ami, err := c.GetLatestAMI("someuser/somebox")
+			amiMap, err := c.GetLatestAMIs("someuser/somebox")
 			Expect(err).NotTo(HaveOccurred())
-
-			Expect(ami).To(Equal("ami-31d7b554"))
+			Expect(amiMap).To(Equal(map[string]string{
+				"ap-northeast-1": "ami-58d24558",
+				"ap-southeast-1": "ami-4a2e3b18",
+				"ap-southeast-2": "ami-0dd89737",
+				"eu-west-1":      "ami-4d8eac3a",
+				"sa-east-1":      "ami-3370e52e",
+				"us-east-1":      "ami-4f1e6a2a",
+				"us-west-1":      "ami-5df23719",
+				"us-west-2":      "ami-8b4956bb",
+			}))
 		})
 	})
 })
