@@ -3,13 +3,10 @@ re-writing some (all?) of the bosh classroom scripts as a Go binary
 
 ### to do
 - cloudformation template for a "classroom"
-  - template parameters:
-    - number of instances
-    - AMI
-    - SSH Keypair
+  - parameters: AMI, keypair, num_instances
   - resources:
+    - ~~ec2 instances~~
     - hosted zone
-    - ec2 instances
     - CNAMEs in hosted zone --> ec2 instances
 - cli actions on a classroom instance named `<name>`:
   - `proctor create -name <name> -number <number>`
