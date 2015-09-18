@@ -2,9 +2,11 @@ package aws_test
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 
 	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/say"
 
@@ -14,10 +16,11 @@ import (
 )
 
 func TestProctor(t *testing.T) {
-	if os.Getenv("SKIP_AWS_INTEGRATION_TESTS") == "true" {
+	if os.Getenv("SKIP_AWS_TESTS") == "true" {
 		say.Println(0, say.Yellow("WARNING: Skipping AWS integration suite"))
 		return
 	}
+	rand.Seed(config.GinkgoConfig.RandomSeed)
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "AWS Integration Suite")
 }

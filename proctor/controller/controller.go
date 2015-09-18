@@ -1,6 +1,10 @@
 package controller
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+)
 
 type atlasClient interface {
 	GetLatestAMIs(string) (map[string]string, error)
@@ -9,6 +13,7 @@ type atlasClient interface {
 type awsClient interface {
 	CreateKey(name string) (string, error)
 	DeleteKey(name string) error
+	ListKeys(prefix string) ([]string, error)
 	StoreObject(name string, bytes []byte, downloadFileName, contentType string) error
 	DeleteObject(name string) error
 	URLForObject(name string) string
@@ -69,4 +74,23 @@ func (c *Controller) DestroyClassroom(name string) error {
 	c.Log.Println(0, "Deleting private key from S3...")
 	err = c.AWSClient.DeleteObject(s3Name)
 	return err
+}
+
+func (c *Controller) ListClassrooms(format string) (string, error) {
+	keys, err := c.AWSClient.ListKeys("classroom-")
+	if err != nil {
+		return "", err
+	}
+	for i, k := range keys {
+		keys[i] = strings.TrimPrefix(k, "classroom-")
+	}
+
+	if format == "json" {
+		jsonBytes, err := json.MarshalIndent(keys, "", "    ")
+		return string(jsonBytes), err
+	}
+	if format == "plain" {
+		return strings.Join(keys, "\n"), nil
+	}
+	return "", fmt.Errorf("expected format to be either 'json' or 'plain'")
 }

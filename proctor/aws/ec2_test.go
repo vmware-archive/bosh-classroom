@@ -22,6 +22,10 @@ var _ = Describe("EC2", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(priv.Validate()).To(Succeed())
 
+		allKeys, err := awsClient.ListKeys("test-key-")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(allKeys).To(ContainElement(keyName))
+
 		Expect(awsClient.DeleteKey(keyName)).To(Succeed())
 	})
 })

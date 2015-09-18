@@ -59,4 +59,26 @@ var _ = Describe("Controller", func() {
 			Expect(awsClient.DeleteObjectCall.Receives.Name).To(Equal("keys/some-classroom-name"))
 		})
 	})
+
+	Describe("ListClassrooms", func() {
+		BeforeEach(func() {
+			awsClient.ListKeysCall.Returns.Keys = []string{"classroom-something", "classroom-something-else"}
+		})
+
+		Context("when the format is json", func() {
+			It("should return the list of all classrooms as JSON", func() {
+				jsonFmt, err := c.ListClassrooms("json")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(jsonFmt).To(MatchJSON(`[ "something", "something-else" ]`))
+			})
+		})
+
+		Context("when the format is plain", func() {
+			It("should return the list of all classrooms as line-separated plain text", func() {
+				plainFmt, err := c.ListClassrooms("plain")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(plainFmt).To(Equal("something\nsomething-else"))
+			})
+		})
+	})
 })

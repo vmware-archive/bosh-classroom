@@ -13,6 +13,7 @@ func main() {
 				Name:        "Actions",
 				Description: "Classroom setup and management",
 				Commands: []say.Command{
+					commands.NewListCommand(),
 					commands.NewCreateCommand(),
 					commands.NewDestroyCommand(),
 				},

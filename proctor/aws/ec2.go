@@ -33,3 +33,25 @@ func (c *Client) DeleteKey(name string) error {
 	_, err := c.EC2.DeleteKeyPair(&ec2.DeleteKeyPairInput{KeyName: aws.String(name)})
 	return err
 }
+
+func (c *Client) ListKeys(prefix string) ([]string, error) {
+	out, err := c.EC2.DescribeKeyPairs(&ec2.DescribeKeyPairsInput{
+		Filters: []*ec2.Filter{
+			&ec2.Filter{
+				Name: aws.String("key-name"),
+				Values: []*string{
+					aws.String(prefix + "*"),
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []string{}
+	for _, kp := range out.KeyPairs {
+		ret = append(ret, *kp.KeyName)
+	}
+	return ret, nil
+}

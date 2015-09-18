@@ -18,6 +18,15 @@ type AWSClient struct {
 			Error error
 		}
 	}
+	ListKeysCall struct {
+		Receives struct {
+			Prefix string
+		}
+		Returns struct {
+			Keys  []string
+			Error error
+		}
+	}
 
 	StoreObjectCall struct {
 		Receives struct {
@@ -57,6 +66,10 @@ func (c *AWSClient) CreateKey(keyName string) (string, error) {
 func (c *AWSClient) DeleteKey(keyName string) error {
 	c.DeleteKeyCall.Receives.KeyName = keyName
 	return c.DeleteKeyCall.Returns.Error
+}
+func (c *AWSClient) ListKeys(prefix string) ([]string, error) {
+	c.ListKeysCall.Receives.Prefix = prefix
+	return c.ListKeysCall.Returns.Keys, c.ListKeysCall.Returns.Error
 }
 
 func (c *AWSClient) StoreObject(name string, bytes []byte,
