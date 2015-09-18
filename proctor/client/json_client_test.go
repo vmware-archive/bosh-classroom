@@ -1,6 +1,8 @@
 package client_test
 
 import (
+	"bytes"
+	"log"
 	"net/http"
 
 	. "github.com/onsi/ginkgo"
@@ -60,10 +62,15 @@ var _ = Describe("JSON Client", func() {
 		})
 
 		Context("when the server is TLS with a self-signed cert", func() {
+			var tlsServer *ghttp.Server
+
 			BeforeEach(func() {
-				server = ghttp.NewTLSServer()
-				server.AppendHandlers(ghttp.CombineHandlers(serverHandler))
-				c.BaseURL = server.URL()
+				tlsServer = ghttp.NewTLSServer()
+				tlsServer.AppendHandlers(ghttp.CombineHandlers(serverHandler))
+				c.BaseURL = tlsServer.URL()
+			})
+			AfterEach(func() {
+				tlsServer.Close()
 			})
 
 			Context("when SkipTLSVerify is true", func() {
@@ -78,6 +85,8 @@ var _ = Describe("JSON Client", func() {
 			})
 			Context("when SkipTLSVerify is false", func() {
 				It("should return an error", func() {
+					// hide tls error
+					tlsServer.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 					c.SkipTLSVerify = false
 
 					err := c.Get(route, &responseStruct)
