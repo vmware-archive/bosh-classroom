@@ -5,24 +5,27 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 type Endpoints struct {
-	Route53 string
-	EC2     string
-	S3      string
+	Route53        string
+	EC2            string
+	S3             string
+	Cloudformation string
 }
 
 type Client struct {
 	EC2            EC2Client
 	S3             S3Client
 	Route53        Route53Client
-	HostedZoneID   string
-	HostedZoneName string
-	Bucket         string
+	Cloudformation CloudformationClient
+	// HostedZoneID   string
+	// HostedZoneName string
+	Bucket string
 }
 
 type S3Client interface {
@@ -39,6 +42,12 @@ type EC2Client interface {
 type Route53Client interface {
 	ChangeResourceRecordSets(input *route53.ChangeResourceRecordSetsInput) (*route53.ChangeResourceRecordSetsOutput, error)
 	ListResourceRecordSets(input *route53.ListResourceRecordSetsInput) (*route53.ListResourceRecordSetsOutput, error)
+}
+
+type CloudformationClient interface {
+	CreateStack(*cloudformation.CreateStackInput) (*cloudformation.CreateStackOutput, error)
+	DeleteStack(*cloudformation.DeleteStackInput) (*cloudformation.DeleteStackOutput, error)
+	DescribeStacks(*cloudformation.DescribeStacksInput) (*cloudformation.DescribeStacksOutput, error)
 }
 
 type AWSError struct {
@@ -75,11 +84,13 @@ func New(config Config) *Client {
 	route53Client := route53.New(sdkConfig.Merge(&aws.Config{MaxRetries: aws.Int(7), Endpoint: aws.String(endpointOverrides.Route53)}))
 	ec2Client := ec2.New(sdkConfig.Merge(&aws.Config{MaxRetries: aws.Int(7), Endpoint: aws.String(endpointOverrides.EC2)}))
 	s3Client := s3.New(sdkConfig.Merge(&aws.Config{MaxRetries: aws.Int(7), Endpoint: aws.String(endpointOverrides.S3), S3ForcePathStyle: aws.Bool(true)}))
+	cloudformationClient := cloudformation.New(sdkConfig.Merge(&aws.Config{MaxRetries: aws.Int(7), Endpoint: aws.String(endpointOverrides.Cloudformation)}))
 
 	return &Client{
-		EC2:     ec2Client,
-		S3:      s3Client,
-		Route53: route53Client,
+		EC2:            ec2Client,
+		S3:             s3Client,
+		Route53:        route53Client,
+		Cloudformation: cloudformationClient,
 		// HostedZoneID:   config.HostedZoneID,
 		// HostedZoneName: config.HostedZoneName,
 		Bucket: config.Bucket,
