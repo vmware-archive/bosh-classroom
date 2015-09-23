@@ -60,15 +60,15 @@ var _ = Describe("Cloudformation", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Eventually(func() (string, error) {
-			return awsClient.DescribeStack(stackID)
+			return awsClient.GetStackStatus(stackID)
 		}, stackOperationTimeout).
 			Should(Equal("CREATE_COMPLETE"))
-		Expect(awsClient.DescribeStack(stackName)).To(Equal("CREATE_COMPLETE"))
+		Expect(awsClient.GetStackStatus(stackName)).To(Equal("CREATE_COMPLETE"))
 
 		Expect(awsClient.DeleteStack(stackName)).To(Succeed())
 
 		Eventually(func() (string, error) {
-			return awsClient.DescribeStack(stackID)
+			return awsClient.GetStackStatus(stackID)
 		}, stackOperationTimeout).
 			Should(Equal("DELETE_COMPLETE"))
 	})

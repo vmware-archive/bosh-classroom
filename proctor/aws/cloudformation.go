@@ -48,7 +48,7 @@ func (c *Client) DeleteStack(nameOrID string) error {
 	return err
 }
 
-func (c *Client) DescribeStack(nameOrID string) (string, error) {
+func (c *Client) GetStackStatus(nameOrID string) (string, error) {
 	out, err := c.Cloudformation.DescribeStacks(&cloudformation.DescribeStacksInput{
 		StackName: aws.String(nameOrID),
 	})

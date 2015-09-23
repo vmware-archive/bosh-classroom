@@ -3,6 +3,7 @@ package commands
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"reflect"
 
@@ -25,6 +26,10 @@ func newControllerFromEnv() controller.Controller {
 	const boxName = "cloudfoundry/bosh-lite"
 
 	awsRegion := loadOrFail("AWS_DEFAULT_REGION")
+	templateFilePath := loadOrFail("TEMPLATE_FILE")
+	templateBody, err := ioutil.ReadFile(templateFilePath)
+	say.ExitIfError("Missing template file", err)
+
 	jsonClient := client.JSONClient{BaseURL: atlasBaseURL}
 	atlasClient := &client.AtlasClient{&jsonClient}
 	awsClient := aws.New(aws.Config{
@@ -41,6 +46,7 @@ func newControllerFromEnv() controller.Controller {
 
 		VagrantBoxName: boxName,
 		Region:         awsRegion,
+		Template:       string(templateBody),
 	}
 
 	return controller

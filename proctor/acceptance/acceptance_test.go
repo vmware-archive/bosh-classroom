@@ -54,7 +54,7 @@ var _ = Describe("Interactions with AWS", func() {
 		Eventually(session.Out, 10).Should(gbytes.Say("ami-[a-z,0-9]"))
 		Eventually(session.Out, 10).Should(gbytes.Say("Creating SSH Keypair"))
 		Eventually(session.Out, 10).Should(gbytes.Say("Uploading private key"))
-		Eventually(session).Should(gexec.Exit(0))
+		Eventually(session, 20).Should(gexec.Exit(0))
 
 		session = run("list", "-format", "json")
 		Eventually(session, 10).Should(gexec.Exit(0))

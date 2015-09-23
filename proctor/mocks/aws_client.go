@@ -57,6 +57,40 @@ type AWSClient struct {
 			URL string
 		}
 	}
+
+	CreateStackCall struct {
+		Receives struct {
+			Name       string
+			Template   string
+			Parameters map[string]string
+		}
+
+		Returns struct {
+			StackID string
+			Error   error
+		}
+	}
+
+	DeleteStackCall struct {
+		Receives struct {
+			Name string
+		}
+
+		Returns struct {
+			Error error
+		}
+	}
+
+	GetStackStatusCall struct {
+		Receives struct {
+			Name string
+		}
+
+		Returns struct {
+			Status string
+			Error  error
+		}
+	}
 }
 
 func (c *AWSClient) CreateKey(keyName string) (string, error) {
@@ -89,4 +123,21 @@ func (c *AWSClient) DeleteObject(name string) error {
 func (c *AWSClient) URLForObject(name string) string {
 	c.URLForObjectCall.Receives.Name = name
 	return c.URLForObjectCall.Returns.URL
+}
+
+func (c *AWSClient) CreateStack(name string, template string, parameters map[string]string) (string, error) {
+	c.CreateStackCall.Receives.Name = name
+	c.CreateStackCall.Receives.Template = template
+	c.CreateStackCall.Receives.Parameters = parameters
+	return c.CreateStackCall.Returns.StackID, c.CreateStackCall.Returns.Error
+}
+
+func (c *AWSClient) DeleteStack(name string) error {
+	c.DeleteStackCall.Receives.Name = name
+	return c.DeleteStackCall.Returns.Error
+}
+
+func (c *AWSClient) GetStackStatus(name string) (string, error) {
+	c.GetStackStatusCall.Receives.Name = name
+	return c.GetStackStatusCall.Returns.Status, c.GetStackStatusCall.Returns.Error
 }

@@ -1,6 +1,9 @@
 package controller_test
 
 import (
+	"fmt"
+	"math/rand"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -14,6 +17,9 @@ var _ = Describe("Controller", func() {
 		atlasClient *mocks.AtlasClient
 		awsClient   *mocks.AWSClient
 		cliLogger   *mocks.CLILogger
+
+		classroomName string
+		prefixedName  string
 	)
 
 	BeforeEach(func() {
@@ -31,32 +37,58 @@ var _ = Describe("Controller", func() {
 
 			VagrantBoxName: "some/vagrantbox",
 			Region:         "some-region",
+			Template:       "some-template-data",
 		}
+
+		classroomName = fmt.Sprintf("test-%d", rand.Intn(16))
+		prefixedName = "classroom-" + classroomName
 	})
 
 	Describe("CreateClassroom", func() {
 		It("should create a new SSH keypair and upload the private key to S3", func() {
 			awsClient.CreateKeyCall.Returns.PrivateKeyPEM = "some-pem-data"
-			Expect(c.CreateClassroom("some-classroom-name", 42)).To(Succeed())
-			Expect(awsClient.CreateKeyCall.Receives.KeyName).To(Equal("classroom-some-classroom-name"))
+			Expect(c.CreateClassroom(classroomName, 42)).To(Succeed())
+			Expect(awsClient.CreateKeyCall.Receives.KeyName).To(Equal(prefixedName))
 
-			Expect(awsClient.StoreObjectCall.Receives.Name).To(Equal("keys/some-classroom-name"))
+			Expect(awsClient.StoreObjectCall.Receives.Name).To(Equal("keys/" + prefixedName))
 			Expect(awsClient.StoreObjectCall.Receives.Bytes).To(Equal([]byte("some-pem-data")))
 			Expect(awsClient.StoreObjectCall.Receives.DownloadFileName).To(Equal("bosh101_ssh_key.pem"))
 			Expect(awsClient.StoreObjectCall.Receives.ContentType).To(Equal("application/x-pem-file"))
 		})
 
 		It("should get the latest AMI for the vagrant box", func() {
-			Expect(c.CreateClassroom("some-classroom-name", 42)).To(Succeed())
+			Expect(c.CreateClassroom(classroomName, 42)).To(Succeed())
 			Expect(atlasClient.GetLatestAMIsCall.Receives.BoxName).To(Equal("some/vagrantbox"))
+		})
+
+		It("should create a CloudFormation stack", func() {
+			Expect(c.CreateClassroom(classroomName, 42)).To(Succeed())
+			Expect(awsClient.CreateStackCall.Receives.Name).To(Equal(prefixedName))
+			Expect(awsClient.CreateStackCall.Receives.Template).To(Equal("some-template-data"))
+			Expect(awsClient.CreateStackCall.Receives.Parameters).To(Equal(map[string]string{
+				"AMI":           "some-ami",
+				"KeyName":       prefixedName,
+				"InstanceCount": "42",
+			}))
+		})
+
+		Context("when the provided name is invalid", func() {
+			It("should return an error", func() {
+				Expect(c.CreateClassroom("invalid_name", 12)).To(MatchError(ContainSubstring("invalid name")))
+			})
 		})
 	})
 
 	Describe("DestroyClassroom", func() {
 		It("should delete the SSH keypair from EC2 and from S3", func() {
-			Expect(c.DestroyClassroom("some-classroom-name")).To(Succeed())
-			Expect(awsClient.DeleteKeyCall.Receives.KeyName).To(Equal("classroom-some-classroom-name"))
-			Expect(awsClient.DeleteObjectCall.Receives.Name).To(Equal("keys/some-classroom-name"))
+			Expect(c.DestroyClassroom(classroomName)).To(Succeed())
+			Expect(awsClient.DeleteKeyCall.Receives.KeyName).To(Equal(prefixedName))
+			Expect(awsClient.DeleteObjectCall.Receives.Name).To(Equal("keys/" + prefixedName))
+		})
+
+		It("should destroy the CloudFormation stack", func() {
+			Expect(c.DestroyClassroom(classroomName)).To(Succeed())
+			Expect(awsClient.DeleteStackCall.Receives.Name).To(Equal(prefixedName))
 		})
 	})
 
