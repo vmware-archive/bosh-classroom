@@ -38,7 +38,7 @@ func (c *Client) CreateStack(name string, template string, parameters map[string
 	if err != nil {
 		return "", err
 	}
-	return *out.StackId, nil
+	return *out.StackID, nil
 }
 
 func (c *Client) DeleteStack(nameOrID string) error {

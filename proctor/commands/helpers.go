@@ -1,14 +1,15 @@
 package commands
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"reflect"
 
 	"github.com/onsi/say"
 	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/aws"
+	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/aws/templates"
 	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/client"
 	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/controller"
 )
@@ -26,9 +27,8 @@ func newControllerFromEnv() controller.Controller {
 	const boxName = "cloudfoundry/bosh-lite"
 
 	awsRegion := loadOrFail("AWS_DEFAULT_REGION")
-	templateFilePath := loadOrFail("TEMPLATE_FILE")
-	templateBody, err := ioutil.ReadFile(templateFilePath)
-	say.ExitIfError("Missing template file", err)
+	templateBody, err := json.Marshal(templates.DefaultTemplate)
+	say.ExitIfError("internal error: unable to marshal CloudFormation template", err)
 
 	jsonClient := client.JSONClient{BaseURL: atlasBaseURL}
 	atlasClient := &client.AtlasClient{&jsonClient}

@@ -63,7 +63,7 @@ var _ = Describe("Interactions with AWS", func() {
 		Expect(classrooms).To(ContainElement(classroomName))
 
 		session = run("destroy", "-name", classroomName)
-		session.Wait()
+		Eventually(session, 20).Should(gexec.Exit(0))
 		Expect(session.ExitCode()).To(Equal(0))
 	})
 })
