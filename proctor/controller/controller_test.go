@@ -117,13 +117,17 @@ var _ = Describe("Controller", func() {
 	Describe("DescribeClassroom", func() {
 		BeforeEach(func() {
 			awsClient.GetStackStatusCall.Returns.Status = "SOME_CLOUDFORMATION_STATUS"
+			awsClient.URLForObjectCall.Returns.URL = "some-url"
 		})
 
 		Context("when the format is json", func() {
 			It("should return the state of the CloudFormation stack", func() {
 				jsonFmt, err := c.DescribeClassroom(classroomName, "json")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(jsonFmt).To(MatchJSON(`{ "status": "SOME_CLOUDFORMATION_STATUS" }`))
+				Expect(jsonFmt).To(MatchJSON(`{
+					"status": "SOME_CLOUDFORMATION_STATUS",
+					"ssh_key": "some-url"
+				}`))
 			})
 		})
 
@@ -131,7 +135,8 @@ var _ = Describe("Controller", func() {
 			It("should return the state of the Cloudformation stack", func() {
 				plainFmt, err := c.DescribeClassroom(classroomName, "plain")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(plainFmt).To(Equal("status: SOME_CLOUDFORMATION_STATUS"))
+				Expect(plainFmt).To(Equal(fmt.Sprintf("status: %s\nssh_key: %s",
+					"SOME_CLOUDFORMATION_STATUS", "some-url")))
 			})
 		})
 	})

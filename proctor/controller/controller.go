@@ -137,16 +137,20 @@ func (c *Controller) DescribeClassroom(name, format string) (string, error) {
 		return "", err
 	}
 
+	keyURL := c.AWSClient.URLForObject("keys/" + prefixedName)
+
 	if format == "json" {
 		var description struct {
 			Status string `json:"status"`
+			SSHKey string `json:"ssh_key"`
 		}
 		description.Status = status
-		descriptionBytes, err := json.Marshal(description)
+		description.SSHKey = keyURL
+		descriptionBytes, err := json.MarshalIndent(description, "", "    ")
 		return string(descriptionBytes), err
 	}
 	if format == "plain" {
-		return fmt.Sprintf("%s: %s", "status", status), nil
+		return fmt.Sprintf("%s: %s\n%s: %s", "status", status, "ssh_key", keyURL), nil
 	}
 	return "", fmt.Errorf("expected format to be either 'json' or 'plain'")
 }
