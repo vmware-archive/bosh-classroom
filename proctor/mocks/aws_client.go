@@ -88,8 +88,20 @@ type AWSClient struct {
 
 		Returns struct {
 			Status     string
+			StackID    string
 			Parameters map[string]string
 			Error      error
+		}
+	}
+
+	GetHostsFromStackIDCall struct {
+		Receives struct {
+			StackID string
+		}
+
+		Returns struct {
+			Hosts map[string]string
+			Error error
 		}
 	}
 }
@@ -138,7 +150,12 @@ func (c *AWSClient) DeleteStack(name string) error {
 	return c.DeleteStackCall.Returns.Error
 }
 
-func (c *AWSClient) DescribeStack(name string) (string, map[string]string, error) {
+func (c *AWSClient) DescribeStack(name string) (string, string, map[string]string, error) {
 	c.DescribeStackCall.Receives.Name = name
-	return c.DescribeStackCall.Returns.Status, c.DescribeStackCall.Returns.Parameters, c.DescribeStackCall.Returns.Error
+	return c.DescribeStackCall.Returns.Status, c.DescribeStackCall.Returns.StackID, c.DescribeStackCall.Returns.Parameters, c.DescribeStackCall.Returns.Error
+}
+
+func (c *AWSClient) GetHostsFromStackID(stackID string) (map[string]string, error) {
+	c.GetHostsFromStackIDCall.Receives.StackID = stackID
+	return c.GetHostsFromStackIDCall.Returns.Hosts, c.GetHostsFromStackIDCall.Returns.Error
 }

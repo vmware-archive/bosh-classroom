@@ -3,13 +3,8 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
+	"github.com/aws/aws-sdk-go/service/ec2"
 )
-
-type cloudformationClient interface {
-	CreateStack(*cloudformation.CreateStackInput) (*cloudformation.CreateStackOutput, error)
-	DeleteStack(*cloudformation.DeleteStackInput) (*cloudformation.DeleteStackOutput, error)
-	DescribeStacks(*cloudformation.DescribeStacksInput) (*cloudformation.DescribeStacksOutput, error)
-}
 
 func (c *Client) CreateStack(name string, template string, parameters map[string]string) (string, error) {
 	paramSlice := []*cloudformation.Parameter{}
@@ -48,21 +43,46 @@ func (c *Client) DeleteStack(nameOrID string) error {
 	return err
 }
 
-func (c *Client) DescribeStack(nameOrID string) (string, map[string]string, error) {
-
+func (c *Client) DescribeStack(nameOrID string) (string, string, map[string]string, error) {
 	out, err := c.Cloudformation.DescribeStacks(&cloudformation.DescribeStacksInput{
 		StackName: aws.String(nameOrID),
 	})
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, err
 	}
 
+	stack := *out.Stacks[0]
+
 	parameters := map[string]string{}
-	for _, parameter := range out.Stacks[0].Parameters {
+	for _, parameter := range stack.Parameters {
 		parameters[*parameter.ParameterKey] = *parameter.ParameterValue
 	}
 
-	status := *out.Stacks[0].StackStatus
+	status := *stack.StackStatus
+	stackID := *stack.StackId
+	return status, stackID, parameters, nil
+}
 
-	return status, parameters, nil
+func (c *Client) GetHostsFromStackID(stackID string) (map[string]string, error) {
+	out, err := c.EC2.DescribeInstances(&ec2.DescribeInstancesInput{
+		Filters: []*ec2.Filter{
+			&ec2.Filter{
+				Name:   aws.String("tag:aws:cloudformation:stack-id"),
+				Values: []*string{aws.String(stackID)},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	hosts := map[string]string{}
+	for _, reservation := range out.Reservations {
+		for _, instance := range reservation.Instances {
+			if instance.PublicIpAddress != nil {
+				hosts[*instance.PublicIpAddress] = *instance.State.Name
+			}
+		}
+	}
+	return hosts, nil
 }

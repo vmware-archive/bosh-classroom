@@ -3,6 +3,7 @@ package controller_test
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -117,11 +118,19 @@ var _ = Describe("Controller", func() {
 	Describe("DescribeClassroom", func() {
 		BeforeEach(func() {
 			awsClient.DescribeStackCall.Returns.Status = "SOME_CLOUDFORMATION_STATUS"
+			awsClient.DescribeStackCall.Returns.StackID = "some-stack-id"
 			awsClient.DescribeStackCall.Returns.Parameters = map[string]string{
 				"some-key":      "some-value",
-				"InstanceCount": "42",
+				"InstanceCount": "4",
 			}
 			awsClient.URLForObjectCall.Returns.URL = "some-url"
+
+			awsClient.GetHostsFromStackIDCall.Returns.Hosts = map[string]string{
+				"host-a": "running",
+				"host-b": "stopped",
+				"host-c": "who-knows",
+				"host-d": "reticulating-splines",
+			}
 		})
 
 		Context("when the format is json", func() {
@@ -131,8 +140,16 @@ var _ = Describe("Controller", func() {
 				Expect(jsonFmt).To(MatchJSON(`{
 					"status": "SOME_CLOUDFORMATION_STATUS",
 					"ssh_key": "some-url",
-					"number": 42
+					"number": 4,
+					"hosts":  {
+						"host-a": "running",
+						"host-b": "stopped",
+						"host-c": "who-knows",
+						"host-d": "reticulating-splines"
+					}
 				}`))
+
+				Expect(awsClient.GetHostsFromStackIDCall.Receives.StackID).To(Equal("some-stack-id"))
 			})
 		})
 
@@ -140,9 +157,17 @@ var _ = Describe("Controller", func() {
 			It("should return the state of the Cloudformation stack", func() {
 				plainFmt, err := c.DescribeClassroom(classroomName, "plain")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(plainFmt).To(Equal(fmt.Sprintf(
-					"status: %s\nnumber: %d\nssh_key: %s",
-					"SOME_CLOUDFORMATION_STATUS", 42, "some-url")))
+				Expect(plainFmt).To(HavePrefix(strings.Join(
+					[]string{
+						"status: SOME_CLOUDFORMATION_STATUS",
+						"number: 4",
+						"ssh_key: some-url",
+						"hosts:",
+					},
+					"\n")))
+
+				Expect(plainFmt).To(ContainSubstring("host-a\trunning"))
+				Expect(plainFmt).To(ContainSubstring("host-d\treticulating-splines"))
 			})
 		})
 

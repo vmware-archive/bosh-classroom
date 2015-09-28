@@ -69,6 +69,7 @@ var _ = Describe("Interactions with AWS", func() {
 			Status string
 			SSHKey string `json:"ssh_key"`
 			Number int
+			Hosts  map[string]string
 		}
 		session = run("describe", "-name", classroomName, "-format", "json")
 		Eventually(session, 10).Should(gexec.Exit(0))
@@ -91,6 +92,15 @@ var _ = Describe("Interactions with AWS", func() {
 			Eventually(session, 10).Should(gexec.Exit(0))
 			return session.Out.Contents()
 		}, 600).Should(ContainSubstring("status: CREATE_COMPLETE"))
+
+		session = run("describe", "-name", classroomName)
+		Eventually(session, 10).Should(gexec.Exit(0))
+		Expect(json.Unmarshal(session.Out.Contents(), &info)).To(Succeed())
+		Expect(info.Status).To(Equal("CREATE_COMPLETE"))
+		Expect(info.Hosts).To(HaveLen(instanceCount))
+		for _, state := range info.Hosts {
+			Expect(state).To(Equal("running"))
+		}
 
 		session = run("destroy", "-name", classroomName)
 		Eventually(session, 20).Should(gexec.Exit(0))

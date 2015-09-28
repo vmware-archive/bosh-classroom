@@ -22,7 +22,8 @@ type awsClient interface {
 	URLForObject(name string) string
 	CreateStack(name string, template string, parameters map[string]string) (string, error)
 	DeleteStack(name string) error
-	DescribeStack(name string) (string, map[string]string, error)
+	DescribeStack(name string) (string, string, map[string]string, error)
+	GetHostsFromStackID(stackID string) (map[string]string, error)
 }
 
 type cliLogger interface {
@@ -133,7 +134,7 @@ func (c *Controller) ListClassrooms(format string) (string, error) {
 func (c *Controller) DescribeClassroom(name, format string) (string, error) {
 	prefixedName := prefix(name)
 
-	status, parameters, err := c.AWSClient.DescribeStack(prefixedName)
+	status, stackID, parameters, err := c.AWSClient.DescribeStack(prefixedName)
 	if err != nil {
 		return "", err
 	}
@@ -141,9 +142,10 @@ func (c *Controller) DescribeClassroom(name, format string) (string, error) {
 	keyURL := c.AWSClient.URLForObject("keys/" + prefixedName)
 
 	var description struct {
-		Status string `json:"status"`
-		Number int    `json:"number"`
-		SSHKey string `json:"ssh_key"`
+		Status string            `json:"status"`
+		Number int               `json:"number"`
+		SSHKey string            `json:"ssh_key"`
+		Hosts  map[string]string `json:"hosts"`
 	}
 	description.Status = status
 	description.SSHKey = keyURL
@@ -151,16 +153,26 @@ func (c *Controller) DescribeClassroom(name, format string) (string, error) {
 	if err != nil {
 		return "", errors.New("malformed CloudFormation stack: missing or invalid parameter 'InstanceCount'")
 	}
+	description.Hosts, err = c.AWSClient.GetHostsFromStackID(stackID)
+	if err != nil {
+		return "", fmt.Errorf("error fetching hosts for stack: %s", err)
+	}
 
 	if format == "json" {
 		descriptionBytes, err := json.MarshalIndent(description, "", "    ")
 		return string(descriptionBytes), err
 	}
 	if format == "plain" {
-		return fmt.Sprintf("%s: %s\n%s: %d\n%s: %s",
+		hosts := []string{}
+		for k, v := range description.Hosts {
+			hosts = append(hosts, fmt.Sprintf("%s\t%s", k, v))
+		}
+		return fmt.Sprintf("%s: %s\n%s: %d\n%s: %s\n%s:\n%s",
 			"status", description.Status,
 			"number", description.Number,
-			"ssh_key", description.SSHKey), nil
+			"ssh_key", description.SSHKey,
+			"hosts", strings.Join(hosts, "\n"),
+		), nil
 	}
 	return "", fmt.Errorf("expected format to be either 'json' or 'plain'")
 }
