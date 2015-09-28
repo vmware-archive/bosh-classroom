@@ -7,58 +7,58 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/aws",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/endpoints",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/protocol/ec2query",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/protocol/query",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/protocol/rest",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/protocol/restxml",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/protocol/xml/xmlutil",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/signer/v4",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/service/ec2",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/service/route53",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/service/s3",
-			"Comment": "v0.9.6",
-			"Rev": "69142c71761512d894b028dc5c8cc312758372dd"
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
