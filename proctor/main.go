@@ -11,11 +11,12 @@ func main() {
 		CommandGroups: []say.CommandGroup{
 			{
 				Name:        "Actions",
-				Description: "Classroom setup and management",
+				Description: "Classroom management",
 				Commands: []say.Command{
-					commands.NewListCommand(),
 					commands.NewCreateCommand(),
+					commands.NewDescribeCommand(),
 					commands.NewDestroyCommand(),
+					commands.NewListCommand(),
 				},
 			},
 		},

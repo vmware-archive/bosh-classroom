@@ -62,6 +62,12 @@ var _ = Describe("Interactions with AWS", func() {
 		Expect(json.Unmarshal(session.Out.Contents(), &classrooms)).To(Succeed())
 		Expect(classrooms).To(ContainElement(classroomName))
 
+		Eventually(func() []byte {
+			session = run("describe", "-name", classroomName)
+			Eventually(session, 10).Should(gexec.Exit(0))
+			return session.Out.Contents()
+		}, 600).Should(ContainSubstring("CREATE_COMPLETE"))
+
 		session = run("destroy", "-name", classroomName)
 		Eventually(session, 20).Should(gexec.Exit(0))
 		Expect(session.ExitCode()).To(Equal(0))

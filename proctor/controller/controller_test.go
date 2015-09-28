@@ -113,4 +113,26 @@ var _ = Describe("Controller", func() {
 			})
 		})
 	})
+
+	Describe("DescribeClassroom", func() {
+		BeforeEach(func() {
+			awsClient.GetStackStatusCall.Returns.Status = "SOME_CLOUDFORMATION_STATUS"
+		})
+
+		Context("when the format is json", func() {
+			It("should return the state of the CloudFormation stack", func() {
+				jsonFmt, err := c.DescribeClassroom(classroomName, "json")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(jsonFmt).To(MatchJSON(`{ "status": "SOME_CLOUDFORMATION_STATUS" }`))
+			})
+		})
+
+		Context("when the format is plain", func() {
+			It("should return the state of the Cloudformation stack", func() {
+				plainFmt, err := c.DescribeClassroom(classroomName, "plain")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(plainFmt).To(Equal("status: SOME_CLOUDFORMATION_STATUS"))
+			})
+		})
+	})
 })

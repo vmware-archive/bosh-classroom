@@ -128,3 +128,25 @@ func (c *Controller) ListClassrooms(format string) (string, error) {
 	}
 	return "", fmt.Errorf("expected format to be either 'json' or 'plain'")
 }
+
+func (c *Controller) DescribeClassroom(name, format string) (string, error) {
+	prefixedName := prefix(name)
+
+	status, err := c.AWSClient.GetStackStatus(prefixedName)
+	if err != nil {
+		return "", err
+	}
+
+	if format == "json" {
+		var description struct {
+			Status string `json:"status"`
+		}
+		description.Status = status
+		descriptionBytes, err := json.Marshal(description)
+		return string(descriptionBytes), err
+	}
+	if format == "plain" {
+		return fmt.Sprintf("%s: %s", "status", status), nil
+	}
+	return "", fmt.Errorf("expected format to be either 'json' or 'plain'")
+}
