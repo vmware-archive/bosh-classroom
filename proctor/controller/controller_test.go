@@ -116,7 +116,11 @@ var _ = Describe("Controller", func() {
 
 	Describe("DescribeClassroom", func() {
 		BeforeEach(func() {
-			awsClient.GetStackStatusCall.Returns.Status = "SOME_CLOUDFORMATION_STATUS"
+			awsClient.DescribeStackCall.Returns.Status = "SOME_CLOUDFORMATION_STATUS"
+			awsClient.DescribeStackCall.Returns.Parameters = map[string]string{
+				"some-key":      "some-value",
+				"InstanceCount": "42",
+			}
 			awsClient.URLForObjectCall.Returns.URL = "some-url"
 		})
 
@@ -126,7 +130,8 @@ var _ = Describe("Controller", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(jsonFmt).To(MatchJSON(`{
 					"status": "SOME_CLOUDFORMATION_STATUS",
-					"ssh_key": "some-url"
+					"ssh_key": "some-url",
+					"number": 42
 				}`))
 			})
 		})
@@ -135,8 +140,20 @@ var _ = Describe("Controller", func() {
 			It("should return the state of the Cloudformation stack", func() {
 				plainFmt, err := c.DescribeClassroom(classroomName, "plain")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(plainFmt).To(Equal(fmt.Sprintf("status: %s\nssh_key: %s",
-					"SOME_CLOUDFORMATION_STATUS", "some-url")))
+				Expect(plainFmt).To(Equal(fmt.Sprintf(
+					"status: %s\nnumber: %d\nssh_key: %s",
+					"SOME_CLOUDFORMATION_STATUS", 42, "some-url")))
+			})
+		})
+
+		Context("when the stack exists but was not created using our tool", func() {
+			BeforeEach(func() {
+				awsClient.DescribeStackCall.Returns.Parameters = map[string]string{}
+			})
+
+			It("should return an error", func() {
+				_, err := c.DescribeClassroom(classroomName, "json")
+				Expect(err).To(HaveOccurred())
 			})
 		})
 	})

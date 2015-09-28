@@ -48,12 +48,21 @@ func (c *Client) DeleteStack(nameOrID string) error {
 	return err
 }
 
-func (c *Client) GetStackStatus(nameOrID string) (string, error) {
+func (c *Client) DescribeStack(nameOrID string) (string, map[string]string, error) {
+
 	out, err := c.Cloudformation.DescribeStacks(&cloudformation.DescribeStacksInput{
 		StackName: aws.String(nameOrID),
 	})
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
-	return *out.Stacks[0].StackStatus, nil
+
+	parameters := map[string]string{}
+	for _, parameter := range out.Stacks[0].Parameters {
+		parameters[*parameter.ParameterKey] = *parameter.ParameterValue
+	}
+
+	status := *out.Stacks[0].StackStatus
+
+	return status, parameters, nil
 }

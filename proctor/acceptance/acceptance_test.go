@@ -3,7 +3,9 @@ package acceptance_test
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
+	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
@@ -13,6 +15,7 @@ import (
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 	"github.com/onsi/say"
+	"github.com/pivotal-cf-experimental/bletchley"
 )
 
 func run(args ...string) *gexec.Session {
@@ -62,11 +65,32 @@ var _ = Describe("Interactions with AWS", func() {
 		Expect(json.Unmarshal(session.Out.Contents(), &classrooms)).To(Succeed())
 		Expect(classrooms).To(ContainElement(classroomName))
 
+		var info struct {
+			Status string
+			SSHKey string `json:"ssh_key"`
+			Number int
+		}
+		session = run("describe", "-name", classroomName, "-format", "json")
+		Eventually(session, 10).Should(gexec.Exit(0))
+		Expect(json.Unmarshal(session.Out.Contents(), &info)).To(Succeed())
+		Expect(info.Status).To(Equal("CREATE_IN_PROGRESS"))
+		Expect(info.Number).To(Equal(instanceCount))
+
+		resp, err := http.Get(info.SSHKey)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.StatusCode).To(Equal(http.StatusOK))
+		Expect(resp.Header["Content-Type"]).To(Equal([]string{"application/x-pem-file"}))
+		keyPEM, err := ioutil.ReadAll(resp.Body)
+		Expect(err).NotTo(HaveOccurred())
+		sshPrivateKey, err := bletchley.PEMToPrivateKey(keyPEM)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(sshPrivateKey).NotTo(BeNil())
+
 		Eventually(func() []byte {
-			session = run("describe", "-name", classroomName)
+			session = run("describe", "-name", classroomName, "-format", "plain")
 			Eventually(session, 10).Should(gexec.Exit(0))
 			return session.Out.Contents()
-		}, 600).Should(ContainSubstring("CREATE_COMPLETE"))
+		}, 600).Should(ContainSubstring("status: CREATE_COMPLETE"))
 
 		session = run("destroy", "-name", classroomName)
 		Eventually(session, 20).Should(gexec.Exit(0))

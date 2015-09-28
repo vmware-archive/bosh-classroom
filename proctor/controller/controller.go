@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -21,7 +22,7 @@ type awsClient interface {
 	URLForObject(name string) string
 	CreateStack(name string, template string, parameters map[string]string) (string, error)
 	DeleteStack(name string) error
-	GetStackStatus(name string) (string, error)
+	DescribeStack(name string) (string, map[string]string, error)
 }
 
 type cliLogger interface {
@@ -132,25 +133,34 @@ func (c *Controller) ListClassrooms(format string) (string, error) {
 func (c *Controller) DescribeClassroom(name, format string) (string, error) {
 	prefixedName := prefix(name)
 
-	status, err := c.AWSClient.GetStackStatus(prefixedName)
+	status, parameters, err := c.AWSClient.DescribeStack(prefixedName)
 	if err != nil {
 		return "", err
 	}
 
 	keyURL := c.AWSClient.URLForObject("keys/" + prefixedName)
 
+	var description struct {
+		Status string `json:"status"`
+		Number int    `json:"number"`
+		SSHKey string `json:"ssh_key"`
+	}
+	description.Status = status
+	description.SSHKey = keyURL
+	description.Number, err = strconv.Atoi(parameters["InstanceCount"])
+	if err != nil {
+		return "", errors.New("malformed CloudFormation stack: missing or invalid parameter 'InstanceCount'")
+	}
+
 	if format == "json" {
-		var description struct {
-			Status string `json:"status"`
-			SSHKey string `json:"ssh_key"`
-		}
-		description.Status = status
-		description.SSHKey = keyURL
 		descriptionBytes, err := json.MarshalIndent(description, "", "    ")
 		return string(descriptionBytes), err
 	}
 	if format == "plain" {
-		return fmt.Sprintf("%s: %s\n%s: %s", "status", status, "ssh_key", keyURL), nil
+		return fmt.Sprintf("%s: %s\n%s: %d\n%s: %s",
+			"status", description.Status,
+			"number", description.Number,
+			"ssh_key", description.SSHKey), nil
 	}
 	return "", fmt.Errorf("expected format to be either 'json' or 'plain'")
 }

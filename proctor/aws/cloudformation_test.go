@@ -59,16 +59,22 @@ var _ = Describe("Cloudformation", func() {
 		stackID, err := awsClient.CreateStack(stackName, template, parameters)
 		Expect(err).NotTo(HaveOccurred())
 
+		stackStatus, returnedParams, err := awsClient.DescribeStack(stackName)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(stackStatus).To(Equal("CREATE_IN_PROGRESS"))
+		Expect(returnedParams).To(Equal(parameters))
+
 		Eventually(func() (string, error) {
-			return awsClient.GetStackStatus(stackID)
+			status, _, err := awsClient.DescribeStack(stackID)
+			return status, err
 		}, stackOperationTimeout).
 			Should(Equal("CREATE_COMPLETE"))
-		Expect(awsClient.GetStackStatus(stackName)).To(Equal("CREATE_COMPLETE"))
 
 		Expect(awsClient.DeleteStack(stackName)).To(Succeed())
 
 		Eventually(func() (string, error) {
-			return awsClient.GetStackStatus(stackID)
+			status, _, err := awsClient.DescribeStack(stackID)
+			return status, err
 		}, stackOperationTimeout).
 			Should(Equal("DELETE_COMPLETE"))
 	})
