@@ -11,7 +11,7 @@ import (
 	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/shell"
 )
 
-var _ = FDescribe("Parallelization", func() {
+var _ = Describe("Parallelization", func() {
 	var runner *mocks.Runner
 	var parallelRunner *shell.ParallelRunner
 	var hosts []string
