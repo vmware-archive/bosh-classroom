@@ -10,3 +10,6 @@ func (l *CliLogger) Println(i int, f string, a ...interface{}) {
 func (l *CliLogger) Green(f string, a ...interface{}) string {
 	return say.Green(f, a...)
 }
+func (l *CliLogger) Red(f string, a ...interface{}) string {
+	return say.Red(f, a...)
+}

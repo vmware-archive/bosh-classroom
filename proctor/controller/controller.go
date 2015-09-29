@@ -1,5 +1,7 @@
 package controller
 
+import "github.com/pivotal-cf-experimental/bosh-classroom/proctor/shell"
+
 type atlasClient interface {
 	GetLatestAMIs(string) (map[string]string, error)
 }
@@ -20,16 +22,29 @@ type awsClient interface {
 type cliLogger interface {
 	Println(indentation int, format string, args ...interface{})
 	Green(format string, args ...interface{}) string
+	Red(format string, args ...interface{}) string
+}
+
+type parallelRunner interface {
+	ConnectAndRun(hosts []string, command string, options *shell.ConnectionOptions) map[string]shell.Result
+}
+
+type webClient interface {
+	Get(url string) ([]byte, error)
 }
 
 type Controller struct {
-	AtlasClient atlasClient
-	AWSClient   awsClient
-	Log         cliLogger
+	AtlasClient    atlasClient
+	AWSClient      awsClient
+	Log            cliLogger
+	ParallelRunner parallelRunner
+	WebClient      webClient
 
 	VagrantBoxName string
 	Region         string
 	Template       string
+	SSHPort        int
+	SSHUser        string
 }
 
 func prefix(classroomName string) string {

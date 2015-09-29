@@ -37,3 +37,24 @@ func (r *Runner) ConnectAndRun(host, command string, options *shell.ConnectionOp
 	call.Receives.Options = options
 	return call.Returns.Stdout, call.Returns.Error
 }
+
+type ParallelRunner struct {
+	ConnectAndRunCall struct {
+		Receives struct {
+			Hosts   []string
+			Command string
+			Options *shell.ConnectionOptions
+		}
+
+		Returns struct {
+			Results map[string]shell.Result
+		}
+	}
+}
+
+func (r *ParallelRunner) ConnectAndRun(hosts []string, command string, options *shell.ConnectionOptions) map[string]shell.Result {
+	r.ConnectAndRunCall.Receives.Hosts = hosts
+	r.ConnectAndRunCall.Receives.Command = command
+	r.ConnectAndRunCall.Receives.Options = options
+	return r.ConnectAndRunCall.Returns.Results
+}

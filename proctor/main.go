@@ -17,6 +17,7 @@ func main() {
 					commands.NewDescribeCommand(),
 					commands.NewDestroyCommand(),
 					commands.NewListCommand(),
+					commands.NewRunCommand(),
 				},
 			},
 		},

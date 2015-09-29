@@ -12,6 +12,7 @@ import (
 	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/aws/templates"
 	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/client"
 	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/controller"
+	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/shell"
 )
 
 func loadOrFail(varName string) string {
@@ -30,6 +31,7 @@ func newControllerFromEnv() controller.Controller {
 	templateBody, err := json.Marshal(templates.DefaultTemplate)
 	say.ExitIfError("internal error: unable to marshal CloudFormation template", err)
 
+	webClient := &client.WebClient{}
 	jsonClient := client.JSONClient{BaseURL: atlasBaseURL}
 	atlasClient := &client.AtlasClient{&jsonClient}
 	awsClient := aws.New(aws.Config{
@@ -38,15 +40,20 @@ func newControllerFromEnv() controller.Controller {
 		RegionName: awsRegion,
 		Bucket:     "bosh101",
 	})
+	parallelRunner := &shell.ParallelRunner{Runner: &shell.Runner{}}
 
 	controller := controller.Controller{
-		AtlasClient: atlasClient,
-		AWSClient:   awsClient,
-		Log:         &CliLogger{},
+		AtlasClient:    atlasClient,
+		AWSClient:      awsClient,
+		Log:            &CliLogger{},
+		WebClient:      webClient,
+		ParallelRunner: parallelRunner,
 
 		VagrantBoxName: boxName,
 		Region:         awsRegion,
 		Template:       string(templateBody),
+		SSHPort:        22,
+		SSHUser:        "ubuntu",
 	}
 
 	return controller
