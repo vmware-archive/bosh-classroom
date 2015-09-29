@@ -12,7 +12,7 @@ import (
 	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/mocks"
 )
 
-var _ = Describe("CreateClassroom", func() {
+var _ = Describe("DescribeClassroom", func() {
 	var (
 		c           *controller.Controller
 		atlasClient *mocks.AtlasClient
