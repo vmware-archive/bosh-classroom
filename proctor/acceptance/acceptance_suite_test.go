@@ -12,6 +12,7 @@ import (
 )
 
 func TestAcceptance(t *testing.T) {
+	rand.Seed(config.GinkgoConfig.RandomSeed)
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Acceptance Suite")
 }
