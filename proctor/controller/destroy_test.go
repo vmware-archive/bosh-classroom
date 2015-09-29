@@ -24,20 +24,12 @@ var _ = Describe("DestroyClassroom", func() {
 
 	BeforeEach(func() {
 		atlasClient = &mocks.AtlasClient{}
-		atlasClient.GetLatestAMIsCall.Returns.AMIMap = map[string]string{
-			"some-region": "some-ami",
-		}
 		awsClient = &mocks.AWSClient{}
 		cliLogger = &mocks.CLILogger{}
 
 		c = &controller.Controller{
-			AtlasClient: atlasClient,
-			AWSClient:   awsClient,
-			Log:         cliLogger,
-
-			VagrantBoxName: "some/vagrantbox",
-			Region:         "some-region",
-			Template:       "some-template-data",
+			AWSClient: awsClient,
+			Log:       cliLogger,
 		}
 
 		classroomName = fmt.Sprintf("test-%d", rand.Intn(16))
