@@ -4,46 +4,33 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 
 	"golang.org/x/crypto/ssh"
 )
 
-type Runner struct {
-	Username       string
-	Port           int
-	PrivateKeyPath string
+type Runner struct{}
+
+type ConnectionOptions struct {
+	Username      string
+	Port          int
+	PrivateKeyPEM []byte
 }
 
-func getPrivateKeySigner(sshKeyPath string) (ssh.Signer, error) {
-	keyBytes, err := ioutil.ReadFile(sshKeyPath)
-	if err != nil {
-		return nil, err
-	}
-
-	sshKey, err := ssh.ParsePrivateKey(keyBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	return sshKey, nil
-}
-
-func (r *Runner) ConnectAndRun(host, command string) (string, error) {
-	signer, err := getPrivateKeySigner(r.PrivateKeyPath)
+func (r *Runner) ConnectAndRun(host, command string, options *ConnectionOptions) (string, error) {
+	signer, err := ssh.ParsePrivateKey(options.PrivateKeyPEM)
 	if err != nil {
 		return "", err
 	}
 
 	config := &ssh.ClientConfig{
-		User: r.Username,
+		User: options.Username,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
 		},
 	}
-	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", host, r.Port), config)
+	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", host, options.Port), config)
 	if err != nil {
 		return "", fmt.Errorf("failed to dial: %s", err)
 	}

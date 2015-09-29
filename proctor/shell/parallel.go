@@ -1,7 +1,7 @@
 package shell
 
 type runner interface {
-	ConnectAndRun(host, command string) (string, error)
+	ConnectAndRun(host, command string, options *ConnectionOptions) (string, error)
 }
 
 type ParallelRunner struct {
@@ -14,10 +14,10 @@ type Result struct {
 	Error  error
 }
 
-func (r *ParallelRunner) ConnectAndRun(hosts []string, command string) map[string]Result {
+func (r *ParallelRunner) ConnectAndRun(hosts []string, command string, options *ConnectionOptions) map[string]Result {
 	results := map[string]Result{}
 	for _, h := range hosts {
-		stdout, err := r.Runner.ConnectAndRun(h, command)
+		stdout, err := r.Runner.ConnectAndRun(h, command, options)
 		results[h] = Result{
 			Host:   h,
 			Stdout: stdout,
