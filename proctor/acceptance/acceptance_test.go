@@ -104,7 +104,7 @@ var _ = Describe("Interactions with AWS", func() {
 
 		session = run("run", "-name", classroomName, "-c", "bosh status")
 		Eventually(session, 20).Should(gexec.Exit(0))
-		Expect(session.Out.Contents()).To(ContainSubstring("Bosh Lite Director"))
+		Expect(session.Out.Contents()).To(ContainSubstring("/home/ubuntu/.bosh_config"))
 
 		session = run("destroy", "-name", classroomName)
 		Eventually(session, 20).Should(gexec.Exit(0))
