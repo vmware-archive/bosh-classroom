@@ -15,14 +15,25 @@ type Result struct {
 }
 
 func (r *ParallelRunner) ConnectAndRun(hosts []string, command string, options *ConnectionOptions) map[string]Result {
-	results := map[string]Result{}
-	for _, h := range hosts {
-		stdout, err := r.Runner.ConnectAndRun(h, command, options)
-		results[h] = Result{
-			Host:   h,
+	runner := func(host string, c chan Result) {
+		stdout, err := r.Runner.ConnectAndRun(host, command, options)
+		c <- Result{
+			Host:   host,
 			Stdout: stdout,
 			Error:  err,
 		}
 	}
+
+	resultsChannel := make(chan Result, len(hosts))
+	for _, host := range hosts {
+		go runner(host, resultsChannel)
+	}
+
+	results := map[string]Result{}
+	for range hosts {
+		result := <-resultsChannel
+		results[result.Host] = result
+	}
+
 	return results
 }

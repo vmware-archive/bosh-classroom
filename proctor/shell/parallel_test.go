@@ -17,15 +17,11 @@ var _ = Describe("Parallelization", func() {
 	var hosts []string
 	var theCommand string
 	var options *shell.ConnectionOptions
+	var helperFinished chan struct{}
 
 	BeforeEach(func() {
-		runner = mocks.NewRunner(15)
-		parallelRunner = &shell.ParallelRunner{
-			Runner: runner,
-		}
-
 		hosts = []string{}
-		n := 1 + rand.Intn(5)
+		n := 2 + rand.Intn(5)
 		for i := 0; i < n; i++ {
 			newHost := fmt.Sprintf("some-host-%d", i)
 			hosts = append(hosts, newHost)
@@ -37,6 +33,23 @@ var _ = Describe("Parallelization", func() {
 			Port:          42,
 			PrivateKeyPEM: []byte("some-pem-bytes"),
 		}
+
+		runner = mocks.NewRunner(len(hosts))
+		parallelRunner = &shell.ParallelRunner{Runner: runner}
+
+		helperFinished = make(chan struct{})
+		go func() {
+			for i := 0; i < len(hosts); i++ {
+				<-runner.Calls
+				// fmt.Println("connect called for " + host)
+			}
+			// fmt.Println("all hosts accounted for, unlocking...")
+			for i := 0; i < len(hosts); i++ {
+				runner.Unlocker <- struct{}{}
+			}
+			// fmt.Println("unlocked...")
+			helperFinished <- struct{}{}
+		}()
 	})
 
 	It("should run the command once for each host", func() {
@@ -54,12 +67,6 @@ var _ = Describe("Parallelization", func() {
 	})
 
 	It("should return a result for each host", func() {
-		for i, host := range hosts {
-			call := runner.ConnectAndRunCalls[i]
-			call.Returns.Stdout = fmt.Sprintf("some result %x from host %s", rand.Int63(), host)
-			call.Returns.Error = fmt.Errorf("some error %x from host %s", rand.Int63(), host)
-		}
-
 		results := parallelRunner.ConnectAndRun(hosts, theCommand, options)
 		Expect(results).NotTo(BeNil())
 		Expect(results).To(HaveLen(len(hosts)))
@@ -70,5 +77,13 @@ var _ = Describe("Parallelization", func() {
 			Expect(result.Stdout).To(ContainSubstring("from host " + host))
 			Expect(result.Error).To(MatchError(ContainSubstring("from host " + host)))
 		}
+	})
+
+	It("should run the commands in parallel", func() {
+		go func() {
+			parallelRunner.ConnectAndRun(hosts, theCommand, options)
+		}()
+
+		Eventually(helperFinished, 5).Should(Receive())
 	})
 })
