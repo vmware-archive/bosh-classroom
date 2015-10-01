@@ -102,8 +102,10 @@ var _ = Describe("Interactions with AWS", func() {
 			Expect(state).To(Equal("running"))
 		}
 
+		Eventually(func() *gexec.Session {
+			return run("run", "-name", classroomName, "-c", "echo hello")
+		}, 120).Should(gexec.Exit(0))
 		session = run("run", "-name", classroomName, "-c", "bosh status")
-		Eventually(session, 20).Should(gexec.Exit(0))
 		Expect(session.Out.Contents()).To(ContainSubstring("/home/ubuntu/.bosh_config"))
 
 		session = run("destroy", "-name", classroomName)
