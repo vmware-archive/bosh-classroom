@@ -1,19 +1,19 @@
 # proctor
 A tool for running BOSH classrooms
 
-## Build from source
+### Building from source
 You need to have a Go development environment set up.  Make sure that `$GOPATH/bin` is in your `$PATH`
 ```
 go get github.com/pivotal-cf-experimental/bosh-classroom/proctor/...
 go install github.com/pivotal-cf-experimental/bosh-classroom
 ```
 
-## Basic usage
+### Basic usage
 0. Load credentials for your AWS environment
     ```
     export AWS_DEFAULT_REGION=us-east-1
-    AWS_ACCESS_KEY_ID=YOUR-ACCESS-KEY
-    AWS_SECRET_ACCESS_KEY=YOUR-SECRET-KEY
+    export AWS_ACCESS_KEY_ID=YOUR-ACCESS-KEY
+    export AWS_SECRET_ACCESS_KEY=YOUR-SECRET-KEY
     ```
     
 0. Create a new classroom
