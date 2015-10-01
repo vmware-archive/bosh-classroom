@@ -89,12 +89,12 @@ var _ = Describe("Interactions with AWS", func() {
 
 		Eventually(func() []byte {
 			session = run("describe", "-name", classroomName, "-format", "plain")
-			Eventually(session, 10).Should(gexec.Exit(0))
+			Eventually(session, "10s").Should(gexec.Exit(0))
 			return session.Out.Contents()
-		}, 600).Should(ContainSubstring("status: CREATE_COMPLETE"))
+		}, "10m", "10s").Should(ContainSubstring("status: CREATE_COMPLETE"))
 
 		session = run("describe", "-name", classroomName)
-		Eventually(session, 10).Should(gexec.Exit(0))
+		Eventually(session, "10s").Should(gexec.Exit(0))
 		Expect(json.Unmarshal(session.Out.Contents(), &info)).To(Succeed())
 		Expect(info.Status).To(Equal("CREATE_COMPLETE"))
 		Expect(info.Hosts).To(HaveLen(instanceCount))
@@ -103,13 +103,17 @@ var _ = Describe("Interactions with AWS", func() {
 		}
 
 		Eventually(func() *gexec.Session {
-			return run("run", "-name", classroomName, "-c", "echo hello")
-		}, 120).Should(gexec.Exit(0))
+			session := run("run", "-name", classroomName, "-c", "echo hello")
+			Eventually(session, "120s").Should(gexec.Exit())
+			return session
+		}, "2m", "10s").Should(gexec.Exit(0))
+
 		session = run("run", "-name", classroomName, "-c", "bosh status")
+		Eventually(session, "120s").Should(gexec.Exit(0))
 		Expect(session.Out.Contents()).To(ContainSubstring("/home/ubuntu/.bosh_config"))
 
 		session = run("destroy", "-name", classroomName)
-		Eventually(session, 20).Should(gexec.Exit(0))
+		Eventually(session, "20s").Should(gexec.Exit(0))
 		Expect(session.ExitCode()).To(Equal(0))
 	})
 })
