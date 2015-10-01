@@ -40,11 +40,8 @@ func NewRunner(maxCallCount int) *Runner {
 	}
 }
 func (r *Runner) ConnectAndRun(host, command string, options *shell.ConnectionOptions) (string, error) {
-	// fmt.Println(host + " connection starting...")
 	r.Calls <- host
-	// fmt.Println(host + " called")
 	<-r.Unlocker
-	// fmt.Println(host + " unlocked")
 
 	r.mutex.Lock()
 	call := r.ConnectAndRunCalls[r.ConnectAndRunCallCount]

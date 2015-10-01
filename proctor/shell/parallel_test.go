@@ -41,13 +41,10 @@ var _ = Describe("Parallelization", func() {
 		go func() {
 			for i := 0; i < len(hosts); i++ {
 				<-runner.Calls
-				// fmt.Println("connect called for " + host)
 			}
-			// fmt.Println("all hosts accounted for, unlocking...")
 			for i := 0; i < len(hosts); i++ {
 				runner.Unlocker <- struct{}{}
 			}
-			// fmt.Println("unlocked...")
 			helperFinished <- struct{}{}
 		}()
 	})
