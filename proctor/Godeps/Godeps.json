@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/pivotal-cf-experimental/bosh-classroom/proctor",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.5.1",
 	"Packages": [
 		"./..."
 	],
@@ -46,6 +46,11 @@
 			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
 		},
 		{
+			"ImportPath": "github.com/aws/aws-sdk-go/service/cloudformation",
+			"Comment": "v0.9.9-4-g2778c83",
+			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
+		},
+		{
 			"ImportPath": "github.com/aws/aws-sdk-go/service/ec2",
 			"Comment": "v0.9.9-4-g2778c83",
 			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
@@ -59,6 +64,14 @@
 			"ImportPath": "github.com/aws/aws-sdk-go/service/s3",
 			"Comment": "v0.9.9-4-g2778c83",
 			"Rev": "2778c8354eae199e75678754615f5beb46a77989"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/errwrap",
+			"Rev": "7554cd9344cec97297fa6649b055a8c98c2a1e55"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/go-multierror",
+			"Rev": "d30f09973e19c1dfcd120b2d9c4f168e68d6b5d5"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
@@ -75,8 +88,20 @@
 			"Rev": "cbcfecc5cfefddcc5dc18051798e909ae0f88c70"
 		},
 		{
+			"ImportPath": "github.com/pivotal-cf-experimental/bletchley",
+			"Rev": "789ab455a81da0c44f88d03b34fa2ab2c0c00cab"
+		},
+		{
 			"ImportPath": "github.com/vaughan0/go-ini",
 			"Rev": "a98ad7ee00ec53921f08832bc06ecf7fd600e6a1"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/curve25519",
+			"Rev": "aedad9a179ec1ea11b7064c57cbc6dc30d7724ec"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ssh",
+			"Rev": "aedad9a179ec1ea11b7064c57cbc6dc30d7724ec"
 		}
 	]
 }
