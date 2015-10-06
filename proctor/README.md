@@ -1,5 +1,5 @@
 # proctor
-A tool for running BOSH classrooms.
+A tool for running BOSH 101 classrooms.
 
 [Pivotal Tracker project](https://www.pivotaltracker.com/n/projects/1434846)
 
