@@ -3,12 +3,9 @@ A tool for running BOSH classrooms.
 
 [Pivotal Tracker project](https://www.pivotaltracker.com/n/projects/1434846)
 
-### Building from source
-You need to have a Go development environment set up.  Make sure that `$GOPATH/bin` is in your `$PATH`
-```
-go get github.com/pivotal-cf-experimental/bosh-classroom/proctor/...
-go install github.com/pivotal-cf-experimental/bosh-classroom
-```
+### Installation
+Download a [binary release](https://github.com/pivotal-cf-experimental/bosh-classroom/releases), and `chmod +x` it. 
+
 
 ### Basic usage
 0. Load credentials for your AWS environment
@@ -40,4 +37,10 @@ go install github.com/pivotal-cf-experimental/bosh-classroom
     proctor destroy -name my-classroom
     ```
     
-    
+
+### Building from source
+You need to have a Go development environment set up.  Make sure that `$GOPATH/bin` is in your `$PATH`
+```
+go get github.com/pivotal-cf-experimental/bosh-classroom/proctor/...
+go install github.com/pivotal-cf-experimental/bosh-classroom
+```    
