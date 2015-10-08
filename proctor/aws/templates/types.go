@@ -56,5 +56,5 @@ func Fn(name string, value interface{}) interface{} {
 }
 
 func FnJoin(sep string, elements ...interface{}) interface{} {
-	return Fn("Join", []interface{}{"", elements})
+	return Fn("Join", []interface{}{sep, elements})
 }
