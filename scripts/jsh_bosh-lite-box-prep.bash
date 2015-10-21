@@ -19,8 +19,25 @@ export  UUID=$(bosh -n status |grep UUID| awk '{print $NF}')
     chmod 700 ~/.ssh
     ssh-keygen -t rsa -P foobar -f ~/.ssh/id_rsa
 }
+if [[ ! -f ~/did-apt-get-update ]]; then
+    sudo apt-get update
+    date >> ~/did-apt-get-update
+fi
+function install_spiff()
+{
+    cd ~/tmp/ && wget -q https://github.com/cloudfoundry-incubator/spiff/releases/download/v1.0.6/spiff_linux_amd64.zip
+    unzip spiff_linux_amd64.zip
+    sudo cp -av spiff /usr/local/bin/
+    type -a spiff
+}
 
-type -a git || sudo apt-get install -y git
+function install_packages()
+{
+    sudo apt-get install -y zip unzip git  || echo "Failed to install apt packages"
+    install_spiff || echo "Failed to install spiff"
+}
+
+install_packages
 
 if [[ ! -d ~/basic-env ]] ; then
     cd && git clone https://github.com/pivotal-cf-experimental/basic-env.git
@@ -39,18 +56,11 @@ if [[ ! -d $DUMMY_RELEASE ]]; then
     set +x
 fi
 
-type -a spiff 2>&1 > /dev/null || {
-    cd ~/tmp/ && wget -q https://github.com/cloudfoundry-incubator/spiff/releases/download/v1.0.6/spiff_linux_amd64.zip
-    type -a unzip || sudo apt-get install -y zip unzip
-    unzip spiff_linux_amd64.zip
-    sudo cp -av spiff /usr/local/bin/
-    type -a spiff
-}
 
 if [[  ! -f  $HOME/workspace/classroom/first.yml ]]; then
     echo "INFO: Generating dummy deploy manifest"
     cd  $DUMMY_RELEASE && \
-    ./generate_deployment_manifest warden ~/workspace/dummy/classroom/stub-first.yml > ~/workspace/dummy/classroom/first.yml
+    ./generate_deployment_manifest warden ~/workspace/classroom/stub-first.yml > ~/workspace/classroom/first.yml
     else
       echo "INFO: dummy deploy manifest 'first.yml' already generated"
 fi
@@ -58,7 +68,7 @@ fi
 if [[  ! -f  $HOME/workspace/classroom/second.yml ]]; then
     cd  $DUMMY_RELEASE && \
     spiff merge $DUMMY_RELEASE/templates/all-jobs-dummy-deployment.yml \
-              $HOME/workspace/classroom/stub-second.yml > $DUMMY_RELEASE/classroom/second.yml
+              $HOME/workspace/classroom/stub-second.yml > ~/workspace/classroom/second.yml
     ls -al  $HOME/workspace/classroom/
     cd -
     else
