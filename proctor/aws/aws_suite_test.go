@@ -15,7 +15,7 @@ import (
 	"testing"
 )
 
-func TestProctor(t *testing.T) {
+func TestAWS(t *testing.T) {
 	if os.Getenv("SKIP_AWS_TESTS") == "true" {
 		say.Println(0, say.Yellow("WARNING: Skipping AWS integration suite"))
 		return
@@ -32,7 +32,7 @@ var _ = BeforeSuite(func() {
 		AccessKey:  loadOrFail("AWS_ACCESS_KEY_ID"),
 		SecretKey:  loadOrFail("AWS_SECRET_ACCESS_KEY"),
 		RegionName: loadOrFail("AWS_DEFAULT_REGION"),
-		Bucket:     "bosh101",
+		Bucket:     "bosh101-proctor",
 	})
 })
 

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -eu
+
+cd $(dirname $0)/..
+ginkgo -randomizeAllSpecs=true -randomizeSuites=true -succinct=true -r ./aws

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -eu
+
+cd $(dirname $0)/..
+export SKIP_AWS_TESTS=true
+ginkgo -randomizeAllSpecs=true -randomizeSuites=true -succinct=true -r -skipPackage=acceptance,aws -p=true ./
+ginkgo -randomizeAllSpecs=true -randomizeSuites=true -succinct=true ./aws/templates
