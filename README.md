@@ -14,7 +14,7 @@ Tools to start and setup BOSH-lite VMs with vagrant aws-plugin for classroom tra
 
 ### Running commands during the classroom:
 
-# Get list of IPs
+#### Get list of IPs
 - `our_boshlites`
 
 Example: 
