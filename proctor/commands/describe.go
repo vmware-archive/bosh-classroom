@@ -21,7 +21,8 @@ func NewDescribeCommand() say.Command {
 		Description: "Describe current state of the classroom",
 		FlagSet:     flags,
 		Run: func(args []string) {
-			validateRequiredArgument("name", name)
+
+			defaultFromEnv(&name)
 
 			c := newControllerFromEnv()
 			output, err := c.DescribeClassroom(name, format)

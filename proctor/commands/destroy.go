@@ -18,7 +18,9 @@ func NewDestroyCommand() say.Command {
 		Description: "Destroy an existing classroom",
 		FlagSet:     flags,
 		Run: func(args []string) {
-			validateRequiredArgument("name", name)
+
+			defaultFromEnv(&name)
+
 			c := newControllerFromEnv()
 			err := c.DestroyClassroom(name)
 			say.ExitIfError("Failed while destroying classroom", err)

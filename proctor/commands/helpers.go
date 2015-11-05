@@ -66,3 +66,9 @@ func validateRequiredArgument(variableName string, value interface{}) {
 		say.ExitIfError("Missing required argument", errors.New("'"+variableName+"'"))
 	}
 }
+
+func defaultFromEnv(name *string) {
+	if *name == "" {
+		*name = os.Getenv("PROCTOR_CLASSROOM_NAME")
+	}
+}

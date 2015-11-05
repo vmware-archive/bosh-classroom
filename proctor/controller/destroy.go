@@ -1,6 +1,10 @@
 package controller
 
 func (c *Controller) DestroyClassroom(name string) error {
+	if err := validName(name); err != nil {
+		return err
+	}
+
 	prefixedName := prefix(name)
 
 	c.Log.Println(0, "Deleting CloudFormation stack %s", c.Log.Green("%s", prefixedName))

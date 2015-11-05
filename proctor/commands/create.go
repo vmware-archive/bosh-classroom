@@ -20,8 +20,9 @@ func NewCreateCommand() say.Command {
 		Description: "Create a fresh classroom environment",
 		FlagSet:     flags,
 		Run: func(args []string) {
-			validateRequiredArgument("name", name)
 			validateRequiredArgument("number", number)
+
+			defaultFromEnv(&name)
 
 			c := newControllerFromEnv()
 			err := c.CreateClassroom(name, number)

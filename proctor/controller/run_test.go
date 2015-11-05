@@ -127,4 +127,13 @@ var _ = Describe("RunOnVMs", func() {
 		})
 	})
 
+	Context("when the provided name is invalid", func() {
+		It("should return an error", func() {
+			err := c.RunOnVMs("invalid_name", "something")
+			Expect(err).To(MatchError(ContainSubstring("invalid classroom name")))
+			err = c.RunOnVMs("", "something")
+			Expect(err).To(MatchError(ContainSubstring("invalid classroom name")))
+		})
+	})
+
 })

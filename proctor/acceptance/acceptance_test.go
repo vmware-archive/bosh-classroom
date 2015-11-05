@@ -116,4 +116,60 @@ var _ = Describe("Interactions with AWS", func() {
 		Eventually(session, "20s").Should(gexec.Exit(0))
 		Expect(session.ExitCode()).To(Equal(0))
 	})
+
+	Context("when the name isn't provided on the command line or via the environment", func() {
+		FIt("should exit with an informative error", func() {
+			os.Setenv("PROCTOR_CLASSROOM_NAME", "")
+			session := run("create", "-number", "2")
+			Eventually(session, 20).Should(gexec.Exit(1))
+			Expect(session.Err.Contents()).To(ContainSubstring("missing classroom name.  either set the flag or the PROCTOR_CLASSROOM_NAME environment variable"))
+		})
+	})
+
+	Context("when I set the PROCTOR_CLASSROOM_NAME", func() {
+		It("doesn't require me to set it on the command line", func() {
+			classroomName := fmt.Sprintf("test-%d", rand.Int31())
+			instanceCount := 3
+
+			os.Setenv("PROCTOR_CLASSROOM_NAME", classroomName)
+
+			session := run("create", "-number", strconv.Itoa(instanceCount))
+			Eventually(session, 20).Should(gexec.Exit(0))
+
+			session = run("describe")
+			Eventually(session, "10s").Should(gexec.Exit(0))
+
+			session = run("destroy")
+			Eventually(session, "20s").Should(gexec.Exit(0))
+			Expect(session.ExitCode()).To(Equal(0))
+		})
+
+		Context("if I also provide a name as a flag", func() {
+			It("should take precedence over the enviornment variable", func() {
+				classroomName := fmt.Sprintf("test-%d", rand.Int31())
+				instanceCount := 3
+
+				session := run("create", "-name", classroomName, "-number", strconv.Itoa(instanceCount))
+				Eventually(session, 20).Should(gexec.Exit(0))
+
+				os.Setenv("PROCTOR_CLASSROOM_NAME", "ignore-this-name")
+				session = run("describe", "-name", classroomName)
+				Eventually(session, "10s").Should(gexec.Exit(0))
+
+				session = run("destroy", "-name", classroomName)
+				Eventually(session, "20s").Should(gexec.Exit(0))
+				Expect(session.ExitCode()).To(Equal(0))
+			})
+		})
+
+		Context("when the name in the environment is invalid", func() {
+			FIt("should exit with an informative error", func() {
+				os.Setenv("PROCTOR_CLASSROOM_NAME", "invalid_name")
+
+				session := run("create", "-number", "3")
+				Eventually(session, 20).Should(gexec.Exit(1))
+				Expect(session.Err.Contents()).To(ContainSubstring("invalid classroom name.  name provided by flag or PROCTOR_CLASSROOM_NAME environment variable must match ^[a-zA-Z][-a-zA-Z0-9]*$"))
+			})
+		})
+	})
 })

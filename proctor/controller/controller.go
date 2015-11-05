@@ -1,6 +1,11 @@
 package controller
 
-import "github.com/pivotal-cf-experimental/bosh-classroom/proctor/shell"
+import (
+	"fmt"
+	"regexp"
+
+	"github.com/pivotal-cf-experimental/bosh-classroom/proctor/shell"
+)
 
 type atlasClient interface {
 	GetLatestAMIs(string) (map[string]string, error)
@@ -49,4 +54,16 @@ type Controller struct {
 
 func prefix(classroomName string) string {
 	return "classroom-" + classroomName
+}
+
+func validName(name string) error {
+	if name == "" {
+		return fmt.Errorf("missing classroom name.  either set the flag or the PROCTOR_CLASSROOM_NAME environment variable")
+	}
+	const requiredPattern = `^[a-zA-Z][-a-zA-Z0-9]*$`
+	regex := regexp.MustCompile(requiredPattern)
+	if !regex.MatchString(name) {
+		return fmt.Errorf("invalid classroom name.  name provided by flag or PROCTOR_CLASSROOM_NAME environment variable must match %s", requiredPattern)
+	}
+	return nil
 }

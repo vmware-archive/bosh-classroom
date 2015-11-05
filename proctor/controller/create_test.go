@@ -73,7 +73,8 @@ var _ = Describe("CreateClassroom", func() {
 
 	Context("when the provided name is invalid", func() {
 		It("should return an error", func() {
-			Expect(c.CreateClassroom("invalid_name", 12)).To(MatchError(ContainSubstring("invalid name")))
+			Expect(c.CreateClassroom("invalid_name", 12)).To(MatchError(ContainSubstring("invalid classroom name")))
+			Expect(c.CreateClassroom("", 12)).To(MatchError(ContainSubstring("invalid classroom name")))
 		})
 	})
 })

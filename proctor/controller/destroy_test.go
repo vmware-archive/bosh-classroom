@@ -46,4 +46,13 @@ var _ = Describe("DestroyClassroom", func() {
 		Expect(c.DestroyClassroom(classroomName)).To(Succeed())
 		Expect(awsClient.DeleteStackCall.Receives.Name).To(Equal(prefixedName))
 	})
+
+	Context("when the provided name is invalid", func() {
+		It("should return an error", func() {
+			err := c.DestroyClassroom("invalid_name")
+			Expect(err).To(MatchError(ContainSubstring("invalid classroom name")))
+			err = c.DestroyClassroom("")
+			Expect(err).To(MatchError(ContainSubstring("invalid classroom name")))
+		})
+	})
 })

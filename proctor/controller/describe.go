@@ -9,6 +9,10 @@ import (
 )
 
 func (c *Controller) DescribeClassroom(name, format string) (string, error) {
+	if err := validName(name); err != nil {
+		return "", err
+	}
+
 	prefixedName := prefix(name)
 
 	status, stackID, parameters, err := c.AWSClient.DescribeStack(prefixedName)

@@ -9,6 +9,10 @@ import (
 )
 
 func (c *Controller) RunOnVMs(name, command string) error {
+	if err := validName(name); err != nil {
+		return err
+	}
+
 	prefixedName := prefix(name)
 
 	stackStatus, stackID, _, err := c.AWSClient.DescribeStack(prefixedName)

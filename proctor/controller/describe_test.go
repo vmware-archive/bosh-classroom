@@ -101,4 +101,12 @@ var _ = Describe("DescribeClassroom", func() {
 		})
 	})
 
+	Context("when the provided name is invalid", func() {
+		It("should return an error", func() {
+			_, err := c.DescribeClassroom("invalid_name", "json")
+			Expect(err).To(MatchError(ContainSubstring("invalid classroom name")))
+			_, err = c.DescribeClassroom("", "json")
+			Expect(err).To(MatchError(ContainSubstring("invalid classroom name")))
+		})
+	})
 })

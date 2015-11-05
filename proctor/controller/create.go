@@ -2,15 +2,12 @@ package controller
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 )
 
 func (c *Controller) CreateClassroom(name string, number int) error {
-	const requiredPattern = `^[a-zA-Z][-a-zA-Z0-9]*$`
-	regex := regexp.MustCompile(requiredPattern)
-	if !regex.MatchString(name) {
-		return fmt.Errorf("invalid name: must match pattern %s", requiredPattern)
+	if err := validName(name); err != nil {
+		return err
 	}
 
 	c.Log.Println(0, "Looking up latest AMI for %s", c.Log.Green("%s", c.VagrantBoxName))

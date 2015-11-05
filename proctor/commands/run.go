@@ -20,8 +20,9 @@ func NewRunCommand() say.Command {
 		Description: "Run a command on all VMs, in parallel",
 		FlagSet:     flags,
 		Run: func(args []string) {
-			validateRequiredArgument("name", name)
 			validateRequiredArgument("c", command)
+
+			defaultFromEnv(&name)
 
 			c := newControllerFromEnv()
 			err := c.RunOnVMs(name, command)
