@@ -1,0 +1,14 @@
+#!/bin/bash
+
+sudo sudo perl -i.old -ne '/^ubuntu/ and do { chomp ; @F = split /:/; $F[1] = q/$6$MPPLHATg$W7rPUGCiCw1DqpNwm5ysW1MTvqmYvmIeIXNXBVBJeTtEc4Dn8lFbwhjElrqdAcblDcE1U5DkXh2WUE1Knfefh0/; print join( ":", @F), ":::\n" ; next }  ; print' /etc/shadow
+
+echo "==== Diff /etc/shadow changes ===="
+sudo diff /etc/shadow.old /etc/shadow
+set -x
+if [[ -f /tmp/sshd_config ]] ; then 
+  sudo cp -v /tmp/sshd_config /etc/ssh/sshd_config
+  sudo chmod 644 /etc/ssh/sshd_config
+  sudo service ssh reload
+else
+  echo "no file /tmp/sshd_config - please copy it in"
+fi
