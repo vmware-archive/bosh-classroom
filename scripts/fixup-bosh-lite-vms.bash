@@ -22,6 +22,9 @@ echo "our bosh-lite VMs are $OUR_BOSHLITES"
 parallel -j 50 "ssh -o StrictHostKeyChecking=no ubuntu@{} id" ::: $OUR_BOSHLITES
 echo parallel -j 50 "ssh -o StrictHostKeyChecking=no ubuntu@{} id" ::: $OUR_BOSHLITES
 
+chmod 755 $THIS_DIR/jsh_*
 
-chmod 755 $THIS_DIR/jsh_bosh-lite-box-prep.bash
+jcp -l ubuntu -w $OUR_BOSHLITES_JSH jcp_fixed_up_sshd_config /tmp/sshd_config
+jsh -e -w $OUR_BOSHLITES_JSH -l ubuntu -s $THIS_DIR/jsh_enable_ubuntu_c1oudc0w_login
+
 jsh -e -w $OUR_BOSHLITES_JSH -l ubuntu -s $THIS_DIR/jsh_bosh-lite-box-prep.bash
